@@ -433,6 +433,27 @@
     traps(zid).filter(t => t.achada).forEach(t => L.push(`Armadilha (T) em ${C.n(t.x, t.y)}: ${t.nome}.`));
     return { nome: z.kind === 'sala' ? z.nome : 'Corredor', desc: z.desc, linhas: L, aqui: zid === e.zone };
   };
+  /* dados para o mapa desenhado (só o que já foi explorado) */
+  G.dadosMapa = function () {
+    const e = E(); if (!e) return null;
+    const d = dg();
+    const celulas = z => z.kind === 'sala' ? [].concat(...Array.from({ length: z.w }, (_, i) => Array.from({ length: z.h }, (_, j) => [z.x + i, z.y + j]))) : z.cells;
+    const floor = {};
+    d.zones.filter(z => z.vis).forEach(z => celulas(z).forEach(([x, y]) => { floor[C.key(x, y)] = z.id; }));
+    const doors = d.conns.filter(c => (d.zones[c.room].vis || d.zones[c.corr].vis) && (!c.secreto || c.achada))
+      .map(c => ({ rx: c.rx, ry: c.ry, cx: c.cx, cy: c.cy, tipo: c.tipo, aberta: aberta(c), secreto: !!c.secreto }));
+    const marks = [];
+    Object.values(d.ents).forEach(en => {
+      if (en.gone || !d.zones[en.zone].vis) return;
+      if (en.kind === 'trap') { if (en.achada || en.sprung) marks.push({ k: 'trap', x: en.x, y: en.y, n: en.nome }); return; }
+      if (en.oculto) return;
+      if (en.kind === 'inimigo') { if (en.hp > 0) marks.push({ k: 'inimigo', x: en.x, y: en.y, n: en.nome }); return; }
+      if (en.kind === 'pista') { marks.push({ k: e.flags[en.pid] ? 'pista-ok' : 'pista', x: en.x, y: en.y, n: en.nome }); return; }
+      marks.push({ k: en.kind, x: en.x, y: en.y, n: en.nome, usada: !!en.usada || !!en.resolvido });
+    });
+    return { W: d.W, H: d.H, floor, doors, marks, pos: e.pos.slice(), stairs: d.stairs.slice(), zona: e.zone,
+      nomes: d.zones.filter(z => z.vis && z.kind === 'sala').map(z => ({ nome: z.nome, x: z.x, y: z.y, w: z.w, h: z.h })) };
+  };
   G.zonasVisitadas = function () { const e = E(); if (!e) return []; return dg().zones.filter(z => z.vis).map(z => z.id); };
 
   /* =========================================================== movimento */

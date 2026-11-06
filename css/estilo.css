@@ -208,3 +208,40 @@ b.co { font-family: var(--sans); font-weight: 700; font-size: .92em; background:
   body { background: var(--papel2); }
   #app { background: var(--papel); border-left: 1px solid var(--linha); border-right: 1px solid var(--linha); }
 }
+
+/* ---------- mapa desenhado ---------- */
+.mapa-caixa { border: 1px solid var(--linha); border-radius: 12px; overflow: auto; background: var(--mp-papel); margin-bottom: 10px; max-height: 62vh; -webkit-overflow-scrolling: touch; }
+.mapa-svg { display: block; width: 100%; height: auto; }
+.mapa-caixa.zoom .mapa-svg { width: 210%; }
+.mapa-barra { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.mapa-leg { font-family: var(--sans); font-size: 12px; color: var(--mudo); display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 14px; }
+.mapa-leg b { color: var(--tinta); }
+:root { --mp-papel: #f7f3ea; --mp-grelha: #b9c7d3; --mp-chao: #fffdf8; --mp-tinta: #1f1b17; --mp-sombra: #8f969c; }
+:root[data-tema="escuro"] { --mp-papel: #1b1814; --mp-grelha: #3a4550; --mp-chao: #2a251f; --mp-tinta: #ece3d2; --mp-sombra: #5c6268; }
+.mp-papel { fill: var(--mp-papel); }
+.mp-grelha { stroke: var(--mp-grelha); stroke-width: .7; opacity: .7; fill: none; }
+.mp-grelha-chao { stroke: var(--mp-grelha); stroke-width: .6; fill: none; opacity: .8; }
+.mp-chao { fill: var(--mp-chao); }
+.mp-rocha { stroke: var(--mp-tinta); stroke-width: 1.1; stroke-linecap: round; opacity: .55; fill: none; }
+.mp-sombra { stroke: var(--mp-sombra); stroke-width: 6; opacity: .45; fill: none; stroke-linecap: square; }
+.mp-parede { stroke: var(--mp-tinta); stroke-width: 3.2; fill: none; stroke-linecap: square; }
+.mp-porta { fill: var(--mp-chao); stroke: var(--mp-tinta); stroke-width: 1.6; }
+.mp-porta.aberta { fill: var(--mp-chao); stroke-dasharray: 2 2; }
+.mp-porta.tranc { fill: var(--mp-tinta); }
+.mp-s { font: 700 13px var(--sans); fill: var(--sangue); text-anchor: middle; }
+.mp-escadas { stroke: var(--mp-tinta); stroke-width: 1.8; fill: none; }
+.mp-inim path { stroke: var(--sangue); stroke-width: 3; stroke-linecap: round; fill: none; }
+.mp-trap { font: 800 17px var(--sans); fill: var(--sangue); text-anchor: middle; }
+.mp-pista { font: 800 18px var(--serif); fill: var(--ouro); text-anchor: middle; }
+.mp-pista.ok { font-size: 14px; opacity: .8; }
+.mp-npc circle, .mp-npc path { stroke: var(--grafite); stroke-width: 2; fill: none; }
+.mp-obj { fill: none; stroke: var(--mp-tinta); stroke-width: 1.6; }
+.mp-obj rect { fill: none; stroke: var(--mp-tinta); stroke-width: 1.6; }
+.mp-obj.item { fill: var(--ouro); stroke: none; }
+.mp-obj.usada { opacity: .4; }
+.mp-mini { font: 700 11px var(--sans); fill: var(--mp-tinta); stroke: none; text-anchor: middle; }
+.mp-tu circle { fill: var(--sangue); }
+.mp-tu .anel { fill: none; stroke: var(--sangue); stroke-width: 2; opacity: .5; animation: pulso 1.6s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes pulso { from { transform: scale(.6); opacity: .8; } to { transform: scale(1.4); opacity: 0; } }
+.mp-coord text { font: 600 11px var(--sans); fill: var(--mudo); text-anchor: middle; }
+input[type=range] { accent-color: var(--sangue); }

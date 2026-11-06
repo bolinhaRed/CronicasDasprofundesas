@@ -40,7 +40,7 @@ Um 1 natural falha sempre; um 6 natural acerta sempre. O modificador total fica 
 
 ## Exploração
 
-* **Mapa**: grelha global (12×16), linha 1 a sul. Salas rectangulares e corredores rectos de 1 quadrado. As portas ficam sempre entre dois quadrados. Nenhuma sala toca noutra sem porta.
+* **Mapa**: o jogador desenha; a aplicação tem um mapa de consulta opcional (só zonas exploradas, com a posição actual). Grelha global (12×16), linha 1 a sul. Salas rectangulares e corredores rectos de 1 quadrado. As portas ficam sempre entre dois quadrados. Nenhuma sala toca noutra sem porta.
 * **Portas**: passagem (aberta), de madeira (abre-se sem teste), emperrada (Força), trancada (Força −1 e barulhenta, Agilidade com gazuas, ou chave escondida noutra sala), secreta (procurar).
 * **Procurar**: só se lança quando há algo escondido; sem nada, gasta tempo.
 * **Armadilhas**: escondidas em corredores, portas e objectos. Detectar (Sentidos) antes; se disparar, Esquivar (Agilidade): sucesso nada, parcial metade, falha dano total.

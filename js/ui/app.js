@@ -3,7 +3,7 @@
   'use strict';
   const G = CP.Game, D = CP.DATA, R = CP.Rules;
   const $app = document.getElementById('app');
-  const ui = { screen: 'capa', folha: null, criar: null, tudo: false, mais: false, vistos: -1, expId: null, tema: lerTema() };
+  const ui = { mapaOculto: lerPref('cronicas_mapa') === 'oculto', mapaZoom: false, screen: 'capa', folha: null, criar: null, tudo: false, mais: false, vistos: -1, expId: null, tema: lerTema() };
 
   /* ------------------------------------------------------------ utilidades */
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -15,6 +15,7 @@
     $app.appendChild(d);
     setTimeout(() => d.remove(), 2200);
   }
+  function lerPref(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lerTema() { try { return localStorage.getItem('cronicas_tema') || 'auto'; } catch (e) { return 'auto'; } }
   function aplicarTema() {
     const t = ui.tema === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro') : ui.tema;
@@ -36,10 +37,26 @@
     if (ui.confirmar) html += `<div class="folha-fundo"><div class="folha" role="alertdialog"><div class="corpo" style="padding-top:20px"><p>${esc(ui.confirmar.texto)}</p>
       <div style="display:flex;gap:8px"><button class="btn sec2 grande" data-act="nao">Cancelar</button><button class="btn grande ${ui.confirmar.perigo ? 'perigo' : ''}" data-act="sim">${esc(ui.confirmar.ok || 'Confirmar')}</button></div></div></div></div>`;
     $app.innerHTML = html;
+    sons(s);
     if (s && s.exp) posScroll();
     else if (s && !s.exp && !ui.folha && ui.rolarAldeia) { ui.rolarAldeia = false; const a = $app.querySelector('.aldeia'); if (a) a.scrollTop = 0; }
+    const cx = $app.querySelector('#mapaCaixa');
+    const tu = $app.querySelector('#mpTu');
+    if (cx && tu) { const r = tu.getBoundingClientRect(), c = cx.getBoundingClientRect(); cx.scrollLeft += (r.left + r.width / 2) - (c.left + c.width / 2); cx.scrollTop += (r.top + r.height / 2) - (c.top + c.height / 2); }
     const inp = $app.querySelector('#cmdIn');
     if (inp && ui.focar) { inp.focus(); ui.focar = false; }
+  }
+
+  /* ------------------------------------------------------------ som */
+  function sons(s) {
+    if (!CP.Som) return;
+    if (!s) return;
+    const L = s.exp ? s.exp.log : s.log;
+    const chave = s.exp ? 'x' + s.exp.seed : 'aldeia';
+    if (ui.somChave !== chave) { const novo = ui.somChave !== undefined && !!s.exp; ui.somChave = chave; ui.somIdx = L.length; if (novo) CP.Som.tocar('porta'); }
+    CP.Som.processar(L, ui.somIdx);
+    ui.somIdx = L.length;
+    CP.Som.setCombate(!!(s.exp && s.exp.combat));
   }
 
   /* ------------------------------------------------------------ capa */
@@ -114,6 +131,7 @@
     for (let i = ini; i < L.length; i++) hist += entrada(L[i], i);
     return `<div class="topo"><div class="tit"><small>${esc(e.local)}</small><h1>${esc(e.titulo)}</h1></div>
         <div class="relogio" title="Tensão: quando enche, algo acontece"><div class="pips">${pips}</div>tensão</div>
+        <button class="btn-ic" data-act="tab" data-v="mapa" aria-label="Mapa">▦</button>
         <button class="btn-ic" data-act="tab" data-v="menu" aria-label="Menu">☰</button></div>
       ${barraGrupo(true)}
       <div class="historia" id="hist">${hist}</div>
@@ -221,7 +239,7 @@
 
   /* ------------------------------------------------------------ folhas */
   function folha() {
-    const T = { ficha: 'Ficha', mochila: 'Mochila', mapa: 'Diário de mapa', diario: 'Diário', menu: 'Menu', regras: 'Como se joga', recrutar: 'Recrutar herói', colar: 'Importar campanha' };
+    const T = { ficha: 'Ficha', mochila: 'Mochila', mapa: 'Mapa', diario: 'Diário', menu: 'Menu', regras: 'Como se joga', recrutar: 'Recrutar herói', colar: 'Importar campanha' };
     const corpo = { ficha: folhaFicha, mochila: folhaMochila, mapa: folhaMapa, diario: folhaDiario, menu: folhaMenu, regras: folhaRegras, recrutar: folhaRecrutar, colar: folhaColar }[ui.folha]();
     return `<div class="folha-fundo" data-act="fechar-fundo"><div class="folha" role="dialog"><header><h2>${T[ui.folha]}</h2><button class="btn-ic" data-act="fechar" aria-label="Fechar">✕</button></header><div class="corpo">${corpo}</div></div></div>`;
   }
@@ -278,10 +296,19 @@
 
   function folhaMapa() {
     const s = S();
-    if (!s.exp) return '<p>O diário de mapa só existe durante uma expedição.</p>';
+    if (!s.exp) return '<p>O mapa só existe durante uma expedição.</p>';
     const e = s.exp;
     const zs = G.zonasVisitadas();
-    return `<p class="sans peq mudo">A aplicação nunca desenha o mapa: aqui tens, por escrito, tudo o que já exploraste, para confirmares ou refazeres o desenho. Grelha ${e.dg.W} colunas (A–${CP.C.col(e.dg.W - 1)}) × ${e.dg.H} linhas, linha 1 em baixo, norte em cima. Legenda: E escadas · X inimigo · T armadilha.</p>` +
+    const oculto = ui.mapaOculto;
+    const desenho = oculto ? `<div class="cartao"><p class="sans peq">Mapa escondido: desenha primeiro na tua folha e depois compara.</p></div>`
+      : `<div class="mapa-caixa ${ui.mapaZoom ? 'zoom' : ''}" id="mapaCaixa">${CP.desenharMapa(G.dadosMapa())}</div>
+        <div class="mapa-leg"><span><b style="color:var(--sangue)">●</b> estás aqui (${CP.C.n(e.pos[0], e.pos[1])})</span><span><b style="color:var(--sangue)">✕</b> inimigo</span><span><b style="color:var(--sangue)">T</b> armadilha</span><span><b style="color:var(--ouro)">?</b> pista</span><span><b>○</b> objecto</span><span><b>▭</b> porta</span><span><b>■</b> trancada</span><span><b style="color:var(--sangue)">S</b> secreta</span><span><b>≡</b> escadas</span></div>`;
+    return `<div class="mapa-barra">
+        ${oculto ? '' : `<button class="btn peq sec2" data-act="mapa-zoom">${ui.mapaZoom ? 'Ver tudo' : 'Aproximar'}</button>`}
+        <button class="btn peq sec2" data-act="mapa-ocultar">${oculto ? 'Mostrar o mapa' : 'Esconder (desenhar primeiro)'}</button></div>
+      ${desenho}
+      <div class="sec">Descrição das zonas</div>
+      <p class="sans peq mudo">Grelha ${e.dg.W} colunas (A–${CP.C.col(e.dg.W - 1)}) × ${e.dg.H} linhas, linha 1 em baixo, norte em cima. Na folha: E escadas · X inimigo · T armadilha.</p>` +
       zs.sort((a, b) => (b === e.zone) - (a === e.zone)).map(id => {
         const d = G.descricaoZona(id);
         return `<div class="cartao ${d.aqui ? 'aqui' : ''}"><h3>${esc(d.nome)}${d.aqui ? ' <span class="sans peq" style="color:var(--sangue)">· estás aqui (' + CP.C.n(e.pos[0], e.pos[1]) + ')</span>' : ''}</h3>
@@ -320,6 +347,12 @@
       <div class="cartao"><h3>Ajuda</h3><div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn sec2" data-act="regras">Regras e como se joga</button>
         ${s && s.exp ? '<button class="btn sec2" data-act="sug" data-v="#ajuda">Lista de acções</button>' : ''}</div></div>
+      ${CP.Som ? `<div class="cartao"><h3>Som</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button class="btn peq ${CP.Som.musica ? '' : 'sec2'}" data-act="musica">Música: ${CP.Som.musica ? 'ligada' : 'desligada'}</button>
+          <button class="btn peq ${CP.Som.efeitos ? '' : 'sec2'}" data-act="efeitos">Efeitos: ${CP.Som.efeitos ? 'ligados' : 'desligados'}</button></div>
+        <label class="sans peq mudo" style="display:flex;align-items:center;gap:10px">Volume da música <input type="range" min="0" max="1" step="0.05" value="${CP.Som.volume}" data-input="volume" style="flex:1"></label>
+        <p class="sans peq mudo" style="margin-bottom:0">Música: «The Longest Journey», de Alexander Nakarada. Os efeitos são gerados pelo jogo.</p></div>` : ''}
       <div class="cartao"><h3>Aparência</h3><div style="display:flex;gap:8px">${Object.keys(temas).map(t => `<button class="btn peq ${ui.tema === t ? '' : 'sec2'}" data-act="tema" data-v="${t}">${temas[t]}</button>`).join('')}</div></div>
       ${s && s.exp ? `<div class="cartao"><h3>Expedição</h3><p class="sans peq mudo">Abandonar conta como retirada: guardas o que encontraste, mas não cumpres a missão.</p><button class="btn perigo" data-act="abandonar">Abandonar a expedição</button></div>` : ''}
       <div class="cartao"><h3>Recomeçar</h3><p class="sans peq mudo">Apaga a campanha deste aparelho. Exporta-a primeiro se a quiseres guardar.</p><button class="btn perigo" data-act="apagar">Apagar campanha</button></div>
@@ -345,8 +378,9 @@
     return `<div class="regras">
       <p>A aplicação é o teu <b>Mestre de Jogo</b>. Narra, descreve as salas, diz-te exactamente o que desenhar e interpreta o teu dado. Tu desenhas a masmorra em papel quadriculado e lanças um dado de seis faces sempre que te for pedido.</p>
       <h3>O mapa</h3>
+      <p>Tu desenhas a masmorra na tua folha. Se te perderes, o separador <b>Mapa</b> (ou o botão ▦ em cima) mostra um mapa desenhado de tudo o que já exploraste, com a tua posição; podes escondê-lo para desenhares primeiro e compararem depois.</p>
       <p>No início de cada aventura, prepara uma grelha (normalmente 12 colunas, A a L, e 16 linhas, 1 a 16). A linha 1 fica em baixo e o norte é o topo da folha. Cada sala nova vem com dimensões e coordenadas exactas, e as portas ficam sempre <i>entre</i> dois quadrados (por exemplo, «entre D9 e D10»). As salas encaixam sempre nas ligações existentes. Marca E nas escadas, X nos inimigos e T nas armadilhas.</p>
-      <p>No separador <b>Mapa</b> tens a descrição escrita de tudo o que já exploraste.</p>
+      <p>Por baixo do mapa tens também a descrição escrita de cada zona.</p>
       <h3>O dado</h3>
       <p>Quando aparecerem os seis dados no ecrã, lança o teu dado físico e toca no resultado. Soma-se o modificador indicado:</p>
       <ul><li><b>1–2</b>: falha — e quase sempre há uma consequência.</li><li><b>3–4</b>: sucesso parcial, ou sucesso com um custo.</li><li><b>5 ou mais</b>: sucesso completo.</li><li>Um <b>1</b> natural falha sempre; um <b>6</b> natural acerta sempre.</li></ul>
@@ -406,7 +440,7 @@
         break;
       }
       case 'sug': ui.folha = null; ui.mais = false; G.input(v); vibra(); break;
-      case 'face': G.roll(+v); vibra(10); break;
+      case 'face': if (CP.Som) CP.Som.tocar('dado'); G.roll(+v); vibra(10); break;
       case 'ajuda': G.ajudar(v); break;
       case 'heroi': G.setActor(v); break;
       case 'mais': ui.mais = !ui.mais; break;
@@ -445,9 +479,17 @@
         break;
       }
       case 'colar': ui.folha = 'colar'; break;
+      case 'musica': CP.Som.setMusica(!CP.Som.musica); break;
+      case 'efeitos': CP.Som.setEfeitos(!CP.Som.efeitos); break;
+      case 'mapa-zoom': ui.mapaZoom = !ui.mapaZoom; break;
+      case 'mapa-ocultar': ui.mapaOculto = !ui.mapaOculto; try { localStorage.setItem('cronicas_mapa', ui.mapaOculto ? 'oculto' : 'visivel'); } catch (e) { /* */ } break;
       case 'tema': ui.tema = v; try { localStorage.setItem('cronicas_tema', v); } catch (e) { /* */ } break;
     }
     render();
+  });
+
+  $app.addEventListener('input', ev => {
+    if (ev.target.dataset.input === 'volume' && CP.Som) CP.Som.setVolume(parseFloat(ev.target.value));
   });
 
   $app.addEventListener('submit', ev => {

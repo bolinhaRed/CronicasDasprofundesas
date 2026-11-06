@@ -2,7 +2,7 @@
 
 RPG de papel, lápis e dado, para jogar sozinho ou em cooperativo (2–4 jogadores no mesmo telemóvel).
 A aplicação é o **Mestre de Jogo**: gera a aventura, narra, diz exactamente o que desenhar e interpreta o teu dado.
-**Não** desenha o mapa e **não** lança dados.
+Tu desenhas a masmorra e lanças o dado; se te perderes, o separador Mapa mostra um mapa desenhado do que já exploraste (pode ser escondido).
 
 Precisas de: papel quadriculado, lápis e um dado de seis faces.
 
@@ -28,6 +28,9 @@ js/core/motor.js           motor de regras e de narração (estado, testes, comb
 js/data/regras.js          classes, armas, armaduras, objectos, tesouros
 js/data/masmorras.js       3 tipos de masmorra: salas, criaturas, armadilhas, enigmas, personagens, eventos, rumores
 js/data/missoes.js         7 missões escritas + região
+js/ui/som.js               música de fundo e efeitos sonoros (sintetizados com Web Audio)
+audio/musica.mp3           «The Longest Journey», de Alexander Nakarada
+js/ui/mapa.js              mapa desenhado opcional (SVG), só com as zonas exploradas
 js/ui/app.js               interface (só lê o estado e envia acções)
 sw.js, manifest.webmanifest, icons/   PWA
 tests/sim.js               testes de coerência e jogador-robô
