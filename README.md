@@ -1,65 +1,64 @@
-# Crónicas das Profundezas — Old School
+# ⚔️ Crónicas das Profundezas — Old School
 
-RPG de papel, lápis e dado, para jogar sozinho ou em cooperativo (2–4 jogadores no mesmo telemóvel).
-A aplicação é o **Mestre de Jogo**: gera a aventura, narra, diz exactamente o que desenhar e interpreta o teu dado.
-Tu desenhas a masmorra e lanças o dado; se te perderes, o separador Mapa mostra um mapa desenhado do que já exploraste (pode ser escondido).
+**RPG de papel, lápis e dado, para jogar sozinho ou em grupo no telemóvel.**
 
-Precisas de: papel quadriculado, lápis e um dado de seis faces.
+🎲 **Jogar agora:** https://bolinhared.github.io/CronicasDasprofundesas/
 
-## Publicar no GitHub Pages
+A aplicação é o teu **Mestre de Jogo**: inventa a aventura, narra a história, diz-te exactamente o que desenhar e interpreta os teus lançamentos.
+**Tu desenhas a masmorra em papel quadriculado e lanças um dado verdadeiro.** É como um livro-jogo misturado com um RPG de exploração, e cada aventura é diferente.
 
-1. Cria um repositório e envia todos os ficheiros desta pasta (com `index.html` na raiz).
-2. *Settings → Pages → Deploy from a branch → main / (root)*.
-3. Abre o endereço no telemóvel e escolhe «Adicionar ao ecrã principal». Depois da primeira visita funciona sem internet.
+---
 
-Também funciona abrindo o `index.html` directamente (sem servidor): todos os scripts são clássicos e os dados estão em ficheiros `.js`. Nesse caso não há modo offline instalável (o service worker exige `http(s)`), mas a gravação funciona.
+## 🧰 O que precisas
 
-Quando alterares ficheiros, muda `VERSAO` em `sw.js` para os telemóveis receberem a actualização.
+- Papel quadriculado
+- Um lápis
+- Um dado de seis faces (D6)
 
-## Arquitectura
+## 📜 Como se joga
 
-```
-index.html                 casca da aplicação
-css/estilo.css             interface (tema claro/escuro)
-js/core/base.js            espaço de nomes, RNG com sementes, coordenadas, regras D6, gravação
-js/core/masmorra.js        gerador procedural de masmorras + preparação da aventura
-js/core/parser.js          intérprete de acções em português (sem IA)
-js/core/motor.js           motor de regras e de narração (estado, testes, combate, cenas, aldeia)
-js/data/regras.js          classes, armas, armaduras, objectos, tesouros
-js/data/masmorras.js       3 tipos de masmorra: salas, criaturas, armadilhas, enigmas, personagens, eventos, rumores
-js/data/missoes.js         7 missões escritas + região
-js/ui/som.js               música de fundo e efeitos sonoros (sintetizados com Web Audio)
-audio/musica.mp3           «The Longest Journey», de Alexander Nakarada
-assets/                    retratos e ícones em pixel art (folhas de sprites) + LICENCAS.md
-js/data/arte.js            correspondência entre heróis, criaturas, objectos e a arte
-js/ui/mapa.js              mapa desenhado opcional (SVG), só com as zonas exploradas
-js/ui/app.js               interface (só lê o estado e envia acções)
-sw.js, manifest.webmanifest, icons/   PWA
-tests/sim.js               testes de coerência e jogador-robô
-```
+1. **Cria o teu herói**: Guerreiro, Ladrão, Explorador ou Místico.
+2. **Escolhe uma missão** no quadro da aldeia de Corvamonte.
+3. **Desenha o que o Mestre te descreve.** Cada sala vem com dimensões e coordenadas exactas (colunas A–L, linhas 1–16):
+   > *Desenha uma sala de 3×3 quadrados: colunas E a G, linhas 1 a 3. Porta norte, entre F3 e F4: uma porta de madeira.*
+4. **Escreve o que queres fazer**, por exemplo «examinar a vela», «abrir porta norte», «ir para C4», «ouvir», «procurar armadilhas» ou «atacar o esqueleto». Também podes tocar nas acções sugeridas.
+5. **Quando aparecer «Lança 1D6»**, lança o teu dado e toca no resultado:
+   - **1–2**: falha
+   - **3–4**: sucesso com um custo
+   - **5–6**: sucesso
 
-* O motor (`js/core`) não toca no DOM. A interface chama `Game.input(texto)`, `Game.roll(n)` e lê `Game.S()` / `Game.sugestoes()`.
-* Os conteúdos estão em `js/data`. Os efeitos dos objectos, opções e desfechos usam uma pequena linguagem de dados (`{t}`, `{dano}`, `{ouro}`, `{item}`, `{flag}`, `{combate}`, `{completa}`, …) documentada no topo de `masmorras.js`.
-* Cada expedição tem uma semente; a mesma semente gera sempre a mesma masmorra. O RNG serve apenas para gerar conteúdo — nunca substitui o dado do jogador.
-* A campanha grava-se em `localStorage` após cada acção, incluindo a meio de um pedido de lançamento, e pode ser exportada/importada em JSON.
+Cada aventura dura **5 a 15 minutos**.
 
-## Testes
+## ✨ Características
 
-```
-node tests/sim.js 40
-```
+- 🗺️ **Masmorras geradas a cada partida**, sempre coerentes: as salas encaixam umas nas outras sem erros.
+- 🔍 **Mistério e exploração**: pistas, portas secretas, armadilhas, enigmas, personagens misteriosas e criaturas que podes evitar.
+- ⚔️ **Combate curto e perigoso**: cada ataque é um único lançamento.
+- 📖 **7 missões escritas** com vários finais e **rumores novos todos os dias** na taberna.
+- 🌍 **Um mundo que se lembra das tuas decisões**: aliados, lojas, descontos e novas missões dependem do que escolheste.
+- 🧙 **Progressão**: experiência, níveis, equipamento, ouro e um cemitério para os heróis que caíram.
+- 👥 **Modo cooperativo para 2 a 4 jogadores** no mesmo telemóvel. A vez passa por ordem e podem ajudar-se nos testes.
+- 🧭 **Mapa de consulta opcional**, desenhado à mão, para quando te perderes. Podes escondê-lo para desenhares primeiro.
+- 🎵 **Música e efeitos sonoros.**
+- 🌙 **Tema claro e escuro.**
+- 💾 **Gravação automática**, e podes exportar e importar a campanha.
 
-Verifica ~1350 masmorras (sem sobreposições, salas só ligadas por portas, portas coerentes com as paredes, objectos dentro das salas, uma coisa por quadrado, chave sempre alcançável, pistas fora da sala final, armadilhas nunca nas pontas dos corredores) e joga centenas de aventuras completas com dados aleatórios, solo e em grupo.
+## 📱 Instalar no telemóvel
 
-## Acrescentar conteúdo
+Abre o link no navegador e escolhe **«Adicionar ao ecrã principal»**. A partir daí, o jogo funciona **sem internet**.
 
-* **Nova missão**: copia uma entrada de `js/data/missoes.js`. Define 3 pistas (são espalhadas da sala mais superficial para a mais funda), a cena final (opções que exigem pistas, objectos ou ouro) e os desfechos (ouro, experiência, marcas no mundo, missões desbloqueadas).
-* **Novo tipo de masmorra**: acrescenta uma chave a `js/data/masmorras.js` com as mesmas listas.
-* **Rumores**: cada tipo de masmorra tem modelos de aventura curta que a taberna sorteia todos os dias.
+## 🛠️ Feito com
 
-## Créditos
+HTML, CSS e JavaScript puro, sem frameworks, sem servidor e sem inteligência artificial externa.
+O motor de regras está separado da interface, e todos os conteúdos (missões, salas, criaturas, armadilhas) estão em ficheiros de dados fáceis de editar. As regras completas estão em [`REGRAS.md`](REGRAS.md).
 
-* Música: «The Longest Journey», de Alexander Nakarada.
-* Retratos: «RPG Character Portraits» (Gen XIA).
-* Ícones de objectos: «Zroth Object», de GELOZ GAMES.
-* Licenças em `assets/LICENCAS.md`. Os recursos gráficos só podem ser usados como parte deste jogo.
+Para correr os testes (coerência dos mapas e partidas jogadas automaticamente): `node tests/sim.js 40`
+
+## 🎶 Créditos
+
+- Música: *«The Longest Journey»*, de Alexander Nakarada.
+- Os efeitos sonoros são gerados pelo próprio jogo.
+
+---
+
+*Boa sorte nas profundezas. Leva uma tocha. E um lápis com bico.* 🕯️
