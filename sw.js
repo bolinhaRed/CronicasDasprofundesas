@@ -1,8 +1,8 @@
 /* Service worker: tudo em cache para jogar sem internet. Muda a VERSAO quando actualizares ficheiros. */
-const VERSAO = 'cronicas-v1.2.0';
+const VERSAO = 'cronicas-v1.3.0';
 const FICHEIROS = [
   './', './index.html', './manifest.webmanifest', './css/estilo.css',
-  './js/core/base.js', './js/data/regras.js', './js/data/masmorras.js', './js/data/missoes.js',
+  './js/core/base.js', './js/data/regras.js', './js/data/arte.js', './js/data/masmorras.js', './assets/retratos.png', './assets/objectos.png', './js/data/missoes.js',
   './js/core/masmorra.js', './js/core/parser.js', './js/core/motor.js', './js/ui/som.js', './js/ui/mapa.js', './audio/musica.mp3', './js/ui/app.js',
   './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-512-maskable.png'
 ];

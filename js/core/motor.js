@@ -34,9 +34,9 @@
   }
   const plural = (n, s, p) => n === 1 ? s : p;
 
-  function log(k, t) {
+  function log(k, t, extra) {
     const L = S.exp ? S.exp.log : S.log;
-    L.push({ k, t });
+    L.push(extra ? Object.assign({ k, t }, extra) : { k, t });
     if (L.length > 700) L.splice(0, L.length - 700);
   }
   const title = t => log('title', t), narr = t => log('narr', t), draw = t => log('draw', t),
@@ -136,6 +136,7 @@
       const nota = n === 1 ? ' (1 natural)' : n === 6 ? ' (6 natural)' : '';
       log('res', `🎲 ${n}${ms} = ${r.total}${nota} → ${R.LABEL[r.band]}`);
       const h = H(p.heroi);
+      e.ultimoRes = { heroi: p.heroi, band: r.band, i: e.log.length };
       (HANDLERS[p.h] || (() => {}))(r, p, h);
       if (r.band === 'falha' && p.ajuda) {
         const ha = H(p.ajuda);
@@ -260,7 +261,7 @@
     const def = clone(T.inimigos.find(i => i.id === defId) || T.inimigos[0]);
     def.hp += Math.max(0, S.herois.filter(h => h.estado !== 'morto').length - 1);
     const id = 'x' + (E().nx++);
-    const en = Object.assign(def, { id, kind: 'inimigo', zone: zid, x: cell[0], y: cell[1], estado: 'alerta', hpMax: def.hp });
+    const en = Object.assign(def, { id, defId: def.id, kind: 'inimigo', zone: zid, x: cell[0], y: cell[1], estado: 'alerta', hpMax: def.hp });
     dg().ents[id] = en;
     return en;
   }
@@ -272,9 +273,9 @@
     G.save();
     return S;
   };
-  G.criarHeroi = function (nome, cls) {
+  G.criarHeroi = function (nome, cls, retrato) {
     const c = D.classes[cls];
-    const h = { id: 'h' + (S.nh++), nome: (nome || c.nome).trim().slice(0, 18), cls, nivel: 1, xp: 0, vidaBase: c.vida, attr: clone(c.attr), arma: c.arma, armadura: c.armadura, escudo: !!c.escudo, focoMax: c.foco, foco: c.foco, estado: 'ok', usos: {} };
+    const h = { id: 'h' + (S.nh++), nome: (nome || c.nome).trim().slice(0, 18), cls, retrato: retrato || (D.arte ? D.arte.porClasse[cls] : null), nivel: 1, xp: 0, vidaBase: c.vida, attr: clone(c.attr), arma: c.arma, armadura: c.armadura, escudo: !!c.escudo, focoMax: c.foco, foco: c.foco, estado: 'ok', usos: {} };
     h.vida = vmax(h);
     Object.keys(c.itens).forEach(k => addItem(k, c.itens[k]));
     S.herois.push(h);
@@ -364,7 +365,11 @@
     const final = zid === dg().obj && !e.completo;
     if (final) {
       e.scene = { tipo: 'final' };
-      if (primeira) narr(e.m.final.intro);
+      if (primeira) {
+        const quem = Object.values(dg().ents).find(x => x.zone === zid && x.final && x.kind === 'npc') || Object.values(dg().ents).find(x => x.zone === zid && x.boss && !x.oculto);
+        if (quem) log('fala', e.m.final.intro, { r: quem.npcId || quem.defId || quem.nome, n: CP.cap(quem.nome), cena: true });
+        else narr(e.m.final.intro);
+      }
       e.quiet = false;
     }
     const temOpcoes = final && opcoesValidas(e.m.final.opcoes).length > 0;
@@ -757,8 +762,8 @@
       if (ef.t) narr(ef.t.replace(/\{heroi\}/g, h ? h.nome : ''));
       if (ef.dano) ferir(h, ef.dano);
       if (ef.cura) curar(h, ef.cura);
-      if (ef.ouro) { S.ouro = Math.max(0, S.ouro + ef.ouro); (ef.ouro > 0 ? good : sys)(ef.ouro > 0 ? `+${ef.ouro} moedas de ouro (bolsa: ${S.ouro}).` : `Pagas ${-ef.ouro} moedas (bolsa: ${S.ouro}).`); }
-      if (ef.item) { addItem(ef.item); good(`Ganhas: ${itemDef(ef.item).nome}.`); }
+      if (ef.ouro) { S.ouro = Math.max(0, S.ouro + ef.ouro); log(ef.ouro > 0 ? 'good' : 'sys', ef.ouro > 0 ? `+${ef.ouro} moedas de ouro (bolsa: ${S.ouro}).` : `Pagas ${-ef.ouro} moedas (bolsa: ${S.ouro}).`, { i: 'ouro' }); }
+      if (ef.item) { addItem(ef.item); log('good', `Ganhas: ${itemDef(ef.item).nome}.`, { i: ef.item }); }
       if (ef.removeItem) delItem(ef.removeItem);
       if (ef.flag) e.flags[ef.flag] = true;
       if (ef.tick) tick(ef.tick);
@@ -807,8 +812,8 @@
   function loot(tab) {
     const L = D.loot[tab] || D.loot.pequeno;
     const r = rpick(L);
-    if (r.ouro) { const n = rint(r.ouro[0], r.ouro[1]); S.ouro += n; good(`Encontras ${n} moedas de ouro (bolsa: ${S.ouro}).`); }
-    if (r.item) { addItem(r.item); good(`Encontras: ${itemDef(r.item).nome}.`); }
+    if (r.ouro) { const n = rint(r.ouro[0], r.ouro[1]); S.ouro += n; log('good', `Encontras ${n} moedas de ouro (bolsa: ${S.ouro}).`, { i: 'ouro' }); }
+    if (r.item) { addItem(r.item); log('good', `Encontras: ${itemDef(r.item).nome}.`, { i: r.item }); }
   }
 
   function revelarArmadilhasTodas() {
@@ -1091,7 +1096,7 @@
     if (!en) return;
     if (!furtivoOk({ a: 'apanhar', id: en.id })) return;
     moverPara(en);
-    if (en.kind === 'item') { addItem(en.item); en.gone = true; good(`Apanhas ${en.desc.replace(/^uma? /, 'a ')}.`); draw(`Apaga o objecto de ${C.n(en.x, en.y)}.`); return; }
+    if (en.kind === 'item') { addItem(en.item); en.gone = true; log('good', `Apanhas ${en.desc.replace(/^uma? /, 'a ')}.`, { i: en.item }); draw(`Apaga o objecto de ${C.n(en.x, en.y)}.`); return; }
     if (en.kind === 'feat' && en.acao) { acaoFeat(en); return; }
     narr('Não é coisa que se leve.');
   }
@@ -1132,7 +1137,7 @@
     if (!en) { narr('Não há aqui ninguém com quem falar.'); return; }
     if (en.kind === 'inimigo') { narr(`${art(en, true)} não parece interessad${en.g === 'f' ? 'a' : 'o'} em conversa.`); return; }
     if (!en.final && !furtivoOk({ a: 'falar', id: en.id })) return;
-    narr(en.fala || `${art(en, true)} olha para ti em silêncio.`);
+    log('fala', en.fala || `${art(en, true)} olha para ti em silêncio.`, { r: en.npcId || en.nome, n: CP.cap(en.nome) });
     if (en.final) { e.scene = { tipo: 'final' }; return; }
     e.scene = { tipo: 'npc', ent: en.id };
   }
@@ -1696,6 +1701,13 @@
     else if (!e.completo) L.push({ l: 'Retirar para a saída', c: '#sair', t: 'perigo' });
     return L;
   };
+
+  G.combateInfo = function () {
+    const e = E();
+    if (!e || !e.combat) return null;
+    return vivosCombate().map(en => ({ id: en.id, nome: en.nome, chave: en.defId || en.nome, tipo: en.tipo, hp: en.hp, hpMax: en.hpMax || en.hp, boss: !!en.boss }));
+  };
+  G.ultimoRes = () => (E() ? E().ultimoRes : null);
 
   G.estadoTeste = function () {
     const e = E();

@@ -193,11 +193,11 @@
     const scale = Math.max(0, (nHerois || 1) - 1);
     if (m.final.npc) {
       const c = freeCell(obj, true);
-      add(Object.assign(clone(m.final.npc), { kind: 'npc', final: true, zone: obj.id, x: c[0], y: c[1] }));
+      add(Object.assign(clone(m.final.npc), { npcId: m.final.npc.nome, kind: 'npc', final: true, zone: obj.id, x: c[0], y: c[1] }));
     }
     (m.final.inimigos || []).forEach((b, i) => {
       const c = freeCell(obj, i === 0) || [obj.x, obj.y];
-      const en = Object.assign(clone(b), { kind: 'inimigo', boss: true, zone: obj.id, x: c[0], y: c[1] });
+      const en = Object.assign(clone(b), { defId: b.id, kind: 'inimigo', boss: true, zone: obj.id, x: c[0], y: c[1] });
       en.def = en.def || 0;
       en.hp += i === 0 ? scale * 2 : scale;
       en.hpMax = en.hp;
@@ -270,7 +270,7 @@
       if (rs.length) {
         const r = rng.pick(rs);
         const c = freeCell(r);
-        if (c) add(Object.assign(clone(rng.pick(T.npcs)), { kind: 'npc', zone: r.id, x: c[0], y: c[1] }));
+        if (c) { const np = rng.pick(T.npcs); add(Object.assign(clone(np), { npcId: np.id, kind: 'npc', zone: r.id, x: c[0], y: c[1] })); }
       }
     }
 

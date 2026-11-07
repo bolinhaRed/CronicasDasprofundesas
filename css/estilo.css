@@ -60,7 +60,7 @@ button { cursor: pointer; }
 /* ---------- grupo ---------- */
 .grupo { display: flex; gap: 8px; padding: 8px 14px; overflow-x: auto; flex: none; border-bottom: 1px solid var(--linha); scrollbar-width: none; }
 .grupo::-webkit-scrollbar { display: none; }
-.heroi { flex: none; display: flex; flex-direction: column; gap: 2px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--linha); background: var(--cartao); font-family: var(--sans); font-size: 12px; min-width: 104px; text-align: left; }
+.heroi { flex: none; display: flex; flex-direction: row; align-items: center; gap: 8px; padding: 5px 10px 5px 5px; border-radius: 10px; border: 1px solid var(--linha); background: var(--cartao); font-family: var(--sans); font-size: 12px; min-width: 104px; text-align: left; }
 .heroi b { font-size: 13px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
 .heroi .barra { height: 4px; border-radius: 2px; background: var(--papel2); overflow: hidden; }
 .heroi .barra span { display: block; height: 100%; background: var(--sangue); }
@@ -245,3 +245,32 @@ b.co { font-family: var(--sans); font-weight: 700; font-size: .92em; background:
 @keyframes pulso { from { transform: scale(.6); opacity: .8; } to { transform: scale(1.4); opacity: 0; } }
 .mp-coord text { font: 600 11px var(--sans); fill: var(--mudo); text-anchor: middle; }
 input[type=range] { accent-color: var(--sangue); }
+
+/* ---------- arte em pixel ---------- */
+.px { display: inline-block; image-rendering: pixelated; image-rendering: crisp-edges; background-repeat: no-repeat; flex: none; vertical-align: middle; }
+.ret { background-image: url("../assets/retratos.png"); background-color: #2b2530; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
+.ico { background-image: url("../assets/objectos.png"); }
+.hcol { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.heroi .hcol { min-width: 66px; }
+.heroi.ouro { min-width: auto; }
+.heroi.caido .ret { filter: grayscale(1); }
+.heroi .barra, .inimigo .barra { display: block; height: 4px; border-radius: 2px; background: var(--papel2); overflow: hidden; }
+.heroi .barra > span, .inimigo .barra > span { display: block; height: 100%; background: var(--sangue); }
+.t-fala { display: flex; gap: 12px; align-items: flex-start; background: var(--cartao); border: 1px solid var(--linha); border-radius: 12px; padding: 10px 12px; margin: 0 0 12px; }
+.t-fala.cena { border-color: var(--sangue); }
+.t-fala b { font-family: var(--sans); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--mudo); }
+.t-fala p { margin: 2px 0 0 !important; }
+.com-ico { display: flex; align-items: center; gap: 8px; }
+.com-ret { display: flex; align-items: center; gap: 10px; }
+.linha .ico { margin-right: 2px; }
+.ficha-topo { display: flex; gap: 12px; align-items: center; }
+.ficha-topo > div { flex: 1; min-width: 0; }
+.retratos { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin: 6px 0 12px; }
+.retratos button { padding: 3px; border: 1.5px solid var(--linha); border-radius: 10px; background: var(--cartao); display: grid; place-items: center; }
+.retratos button .ret { width: 100% !important; height: auto !important; aspect-ratio: 1; }
+.retratos button.on { border-color: var(--sangue); box-shadow: inset 0 0 0 1px var(--sangue); }
+.inimigos { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 8px; scrollbar-width: none; }
+.inimigo { display: flex; align-items: center; gap: 8px; padding: 4px 10px 4px 4px; border: 1px solid var(--sangue); border-radius: 10px; background: var(--cartao); font-family: var(--sans); font-size: 12px; flex: none; }
+.inimigo.boss { box-shadow: inset 0 0 0 1px var(--sangue); }
+.inimigo b { font-size: 12.5px; white-space: nowrap; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+.inimigo .st { color: var(--tinta2); }

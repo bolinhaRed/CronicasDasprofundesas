@@ -4,7 +4,7 @@ global.window = global;
 const store = {};
 global.localStorage = { getItem: k => store[k] || null, setItem: (k, v) => { store[k] = v; }, removeItem: k => { delete store[k]; } };
 const base = __dirname + '/../js/';
-['core/base.js', 'data/regras.js', 'data/masmorras.js', 'data/missoes.js', 'core/masmorra.js', 'core/parser.js', 'core/motor.js'].forEach(f => require(base + f));
+['core/base.js', 'data/regras.js', 'data/arte.js', 'data/masmorras.js', 'data/missoes.js', 'core/masmorra.js', 'core/parser.js', 'core/motor.js'].forEach(f => require(base + f));
 const CP = global.CP, G = CP.Game, C = CP.C;
 let falhas = 0;
 const erro = (m) => { falhas++; if (falhas < 30) console.log('  ✗', m); };

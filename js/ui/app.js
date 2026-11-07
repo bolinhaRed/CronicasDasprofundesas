@@ -47,6 +47,42 @@
     if (inp && ui.focar) { inp.focus(); ui.focar = false; }
   }
 
+  /* ------------------------------------------------------------ arte em pixel */
+  const A = D.arte;
+  function ret(chave, expr, px, cls) {
+    const r = A.personagens.indexOf(chave);
+    if (r < 0) return '';
+    const c = Math.max(0, A.expressoes.indexOf(expr || 'neutral'));
+    return `<span class="px ret ${cls || ''}" style="width:${px}px;height:${px}px;background-size:${6 * px}px ${12 * px}px;background-position:${-c * px}px ${-r * px}px"></span>`;
+  }
+  function ico(item, px) {
+    px = px || 24;
+    const i = A.objectos.indexOf(A.itens[item]);
+    if (i < 0) return '';
+    return `<span class="px ico" style="width:${px}px;height:${px}px;background-size:${A.objectos.length * px}px ${px}px;background-position:${-i * px}px 0"></span>`;
+  }
+  const chaveInimigo = (k, tipo) => A.inimigos[k] || A.porTipo[tipo] || 'skeleton';
+  const retFala = k => A.npcs[k] || (A.inimigos[k] ? [A.inimigos[k], 'angry'] : ['bard', 'neutral']);
+  function retHeroi(h) { return h.retrato || A.porClasse[h.cls]; }
+  function exprHeroi(h) {
+    const s = S(), e = s.exp;
+    if (h.estado === 'caido') return 'hurt';
+    if (!e) return s.ultimo && s.ultimo.fim === 'sucesso' ? 'happy' : (h.vida < G.vmax(h) / 2 ? 'sad' : 'neutral');
+    const ini = ultimaJogada(e.log);
+    const lote = e.log.slice(ini);
+    if (lote.some(l => l.k === 'bad' && l.t.indexOf(h.nome + ' sofre') === 0)) return 'hurt';
+    const u = e.ultimoRes;
+    if (u && u.heroi === h.id && u.i >= ini) { if (u.band === 'sucesso') return 'happy'; if (u.band === 'falha') return 'sad'; }
+    if (lote.some(l => l.k === 'event' || l.k === 'combat' && /Combate!/.test(l.t) || (l.k === 'draw' && /disparada/.test(l.t)))) return 'surprised';
+    if (e.combat) return 'angry';
+    if (h.vida <= G.vmax(h) / 3) return 'hurt';
+    if (e.completo) return 'happy';
+    return 'neutral';
+  }
+  function seletorRetrato(actual, act) {
+    return `<div class="retratos">${A.herois.map(k => `<button class="${actual === k ? 'on' : ''}" data-act="${act}" data-v="${k}" aria-label="${k}">${ret(k, actual === k ? 'happy' : 'neutral', 44)}</button>`).join('')}</div>`;
+  }
+
   /* ------------------------------------------------------------ som */
   function sons(s) {
     if (!CP.Som) return;
@@ -98,6 +134,7 @@
       <div class="sec">Herói${passo}</div>
       <input class="campo" id="nomeHeroi" maxlength="18" placeholder="Nome do herói" value="${esc(h.nome)}">
       <div class="classes">${cls}</div>
+      <div class="sec">Retrato</div>${seletorRetrato(h.ret || A.porClasse[h.cls], 'ret')}
       <div class="cartao"><h3>${d.nome}</h3><ul>${d.habs.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
         <p class="sans peq mudo">Começa com: ${esc(D.armas[d.arma].nome)}${d.armadura ? ', ' + esc(D.armaduras[d.armadura].nome) : ''}${d.escudo ? ', escudo' : ''}, ${Object.keys(d.itens).map(i => D.itens[i].nome).join(', ')}.</p></div>
       <button class="btn grande" data-act="criar-ok">${c.idx < c.n - 1 ? 'Próximo herói →' : (nova ? 'Começar em Corvamonte' : 'Juntar à companhia')}</button>
@@ -115,9 +152,9 @@
       const vm = G.vmax(h);
       const pct = Math.max(0, Math.round(100 * h.vida / vm));
       return `<button class="heroi ${act && act.id === h.id && hs.length > 1 ? 'activo' : ''} ${h.estado === 'caido' ? 'caido' : ''}" ${clicavel ? `data-act="heroi" data-v="${h.id}"` : 'data-act="tab" data-v="ficha"'}>
-        <b>${esc(h.nome)}</b><div class="barra"><span style="width:${pct}%"></span></div>
-        <span class="st">♥ ${h.vida}/${vm}${h.focoMax ? ` · ✦ ${h.foco}` : ''} · ${D.classes[h.cls].nome}</span></button>`;
-    }).join('')}<button class="heroi" data-act="tab" data-v="mochila" style="min-width:auto"><b>◈ ${s.ouro}</b><span class="st">moedas</span></button></div>`;
+        ${ret(retHeroi(h), exprHeroi(h), 40)}<span class="hcol"><b>${esc(h.nome)}</b><span class="barra"><span style="width:${pct}%"></span></span>
+        <span class="st">♥ ${h.vida}/${vm}${h.focoMax ? ` · ✦ ${h.foco}` : ''}</span></span></button>`;
+    }).join('')}<button class="heroi ouro" data-act="tab" data-v="mochila">${ico('ouro', 32)}<span class="hcol"><b>${s.ouro}</b><span class="st">moedas</span></span></button></div>`;
   }
 
   /* ------------------------------------------------------------ jogo */
@@ -143,6 +180,8 @@
     const k = l.k;
     if (k === 'title') return `<h2 class="t-title" data-i="${i}">${esc(l.t)}</h2>`;
     if (k === 'roll') return `<p class="t-roll" data-i="${i}">🎲 ${fmt(l.t)}</p>`;
+    if (k === 'fala') { const [c, x] = retFala(l.r); return `<div class="t-fala ${l.cena ? 'cena' : ''}" data-i="${i}">${ret(c, x, 52)}<div><b>${esc(l.n || '')}</b><p>${fmt(l.t)}</p></div></div>`; }
+    if (l.i) return `<p class="t-${k} com-ico" data-i="${i}">${ico(l.i, 24)}<span>${fmt(l.t)}</span></p>`;
     return `<p class="t-${k}" data-i="${i}">${fmt(l.t)}</p>`;
   }
   function posScroll() {
@@ -169,7 +208,7 @@
         ? '<span>1–2 morte</span><span>3–4 inconsciente</span><span>5–6 levanta-se</span>'
         : '<span>1–2 falha</span><span>3–4 parcial</span><span>5+ sucesso</span><span>1 falha sempre · 6 acerta sempre</span>';
       const ajud = t.ajudantes.length ? `<div class="ajud">${t.ajudantes.map(a => `<button data-act="ajuda" data-v="${a.id}" class="${t.ajuda === a.id ? 'on' : ''}">${esc(a.nome)} ajuda (+1, partilha o risco)</button>`).join('')}</div>` : '';
-      return `<div class="doca com-tabs"><div class="dado">
+      return `<div class="doca com-tabs">${painelCombate()}<div class="dado">
         <div class="q">${esc(t.rotulo.replace(/\s*Lança 1D6\.?$/, ''))}</div>${mods}
         <div class="leg">${leg}</div>${ajud}
         <div class="faces">${faces}</div>
@@ -184,8 +223,16 @@
     else if (ui.mais && resto.length > 4) chips += `<button class="sug mais" data-act="mais">menos</button>`;
     const act = G.actor();
     const quem = s.herois.filter(h => h.estado === 'ok').length > 1 && act ? `<div class="quem">A agir: <b>${esc(act.nome)}</b>${e.combat ? ' (vez de combate)' : ' · toca num herói para mudar'}</div>` : '';
-    return `<div class="doca com-tabs">${quem}<div class="sugs">${chips}</div>
+    return `<div class="doca com-tabs">${painelCombate()}${quem}<div class="sugs">${chips}</div>
       <form class="cmd" data-form="cmd"><input id="cmdIn" autocomplete="off" autocapitalize="off" enterkeyhint="send" placeholder="${e.combat ? 'Em combate! O que fazes?' : 'O que fazes?'}"><button aria-label="Enviar">➤</button></form></div>`;
+  }
+  function painelCombate() {
+    const L = G.combateInfo();
+    if (!L || !L.length) return '';
+    return `<div class="inimigos">${L.map(en => {
+      const pct = Math.max(0, Math.round(100 * en.hp / en.hpMax));
+      return `<div class="inimigo ${en.boss ? 'boss' : ''}">${ret(chaveInimigo(en.chave, en.tipo), en.hp <= en.hpMax / 2 ? 'hurt' : 'angry', 38)}<span class="hcol"><b>${esc(CP.cap(en.nome))}</b><span class="barra"><span style="width:${pct}%"></span></span><span class="st">♥ ${en.hp}/${en.hpMax}</span></span></div>`;
+    }).join('')}</div>`;
   }
   function pips(n) {
     const P = { 1: [4], 2: [2, 6], 3: [2, 4, 6], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] }[n];
@@ -219,11 +266,11 @@
           : '<div class="cartao"><p>Não há trabalho no quadro hoje. Descansa na estalagem: amanhã há sempre rumores novos.</p></div>'}
         <div class="sec">Corvamonte</div>
         <div class="cartao"><p>${esc(G.descricaoAldeia())}</p></div>
-        <div class="cartao"><h3>Estalagem do Corvo Manco</h3>
+        <div class="cartao"><h3 class="com-ret">${ret(A.aldeia.estalagem[0], A.aldeia.estalagem[1], 40)}Estalagem do Corvo Manco</h3>
           <p class="sans peq">Uma noite de sono: todos recuperam a Vida e o Foco, e passa um dia (há rumores novos no quadro). ${custo} ${custo === 1 ? 'moeda' : 'moedas'}.</p>
           <button class="btn ${feridos ? '' : 'sec2'}" data-act="estalagem">Dormir na estalagem</button></div>
-        <div class="cartao"><h3>Mercado</h3>${loja('mercado')}</div>
-        <div class="cartao"><h3>Forja de Anselmo</h3>${s.flags.tome_salvo ? '<p class="sans peq mudo">Desconto de 20% por teres salvo o Tomé.</p>' : ''}${loja('ferreiro')}</div>
+        <div class="cartao"><h3 class="com-ret">${ret(A.aldeia.mercado[0], A.aldeia.mercado[1], 40)}Mercado</h3>${loja('mercado')}</div>
+        <div class="cartao"><h3 class="com-ret">${ret(A.aldeia.forja[0], s.flags.tome_salvo ? 'happy' : 'neutral', 40)}Forja de Anselmo</h3>${s.flags.tome_salvo ? '<p class="sans peq mudo">Desconto de 20% por teres salvo o Tomé.</p>' : ''}${loja('ferreiro')}</div>
         <div class="cartao"><h3>A companhia</h3>
           <p class="sans peq">${s.herois.filter(h => h.estado !== 'morto').map(h => `${esc(h.nome)} (${D.classes[h.cls].nome}, nível ${h.nivel})`).join(' · ')}</p>
           ${s.herois.length < 4 ? '<button class="btn sec2 peq" data-act="recrutar">Recrutar outro herói (co-op)</button>' : ''}
@@ -233,7 +280,7 @@
   }
   function loja(nome) {
     const s = S();
-    return G.loja(nome).map(it => `<div class="linha"><div class="n">${esc(it.nome)} <small>${esc(it.desc || '')}</small></div>
+    return G.loja(nome).map(it => `<div class="linha">${ico(it.id, 32)}<div class="n">${esc(it.nome)} <small>${esc(it.desc || '')}</small></div>
       <button class="btn peq" data-act="comprar" data-v="${it.id}" data-l="${nome}" ${s.ouro >= it.preco ? '' : 'disabled'}>${it.preco} ◈</button></div>`).join('');
   }
 
@@ -259,13 +306,14 @@
         ops.push(`<button class="btn peq sec2" data-act="subir" data-h="${h.id}" data-v="vida">+2 Vida extra</button>`);
         subir = `<p class="sans peq" style="color:var(--ouro);font-weight:650">✦ Pode subir ao nível ${h.nivel + 1} (+1 Vida e uma escolha):</p><div style="display:flex;gap:6px;flex-wrap:wrap">${ops.join('')}</div>`;
       } else if (G.podeSubir(h)) subir = '<p class="sans peq" style="color:var(--ouro)">✦ Pode subir de nível quando voltar à aldeia.</p>';
-      return `<div class="cartao"><h3>${esc(h.nome)}</h3><div class="meta">${c.nome} · nível ${h.nivel} · ${h.xp} XP${prox ? ' (próximo: ' + prox + ')' : ''}</div>
-        <div class="xp"><span style="width:${pct}%"></span></div>
+      return `<div class="cartao"><div class="ficha-topo">${ret(retHeroi(h), exprHeroi(h), 64)}<div><h3>${esc(h.nome)}</h3><div class="meta">${c.nome} · nível ${h.nivel} · ${h.xp} XP${prox ? ' (próximo: ' + prox + ')' : ''}</div>
+        <div class="xp"><span style="width:${pct}%"></span></div></div></div>
         <p class="sans peq">♥ Vida <b>${h.vida}/${G.vmax(h)}</b>${h.focoMax ? ` · ✦ Foco <b>${h.foco}/${h.focoMax}</b>` : ''}${h.estado === 'caido' ? ' · <b style="color:var(--sangue)">caído</b>' : ''}</p>
         <div class="attrs">${Object.keys(R.ATTR).map(a => `<div><b>+${h.attr[a]}</b>${R.ATTR[a]}</div>`).join('')}</div>
-        <p class="sans peq">⚔ ${esc(w.nome)} — ${R.ATTR[w.attr]}, dano ${w.dano}${w.nota ? ' · ' + esc(w.nota) : ''}<br>
-        ⛨ ${h.armadura ? esc(D.armaduras[h.armadura].nome) + ' (+' + D.armaduras[h.armadura].vida + ' Vida)' : 'Sem armadura'}${h.escudo ? ' · Escudo' : ''}</p>
+        <p class="sans peq">${ico(h.arma, 24) || '⚔'} ${esc(w.nome)} — ${R.ATTR[w.attr]}, dano ${w.dano}${w.nota ? ' · ' + esc(w.nota) : ''}<br>
+        ${h.armadura ? ico(h.armadura, 24) : '⛨'} ${h.armadura ? esc(D.armaduras[h.armadura].nome) + ' (+' + D.armaduras[h.armadura].vida + ' Vida)' : 'Sem armadura'}${h.escudo ? ' · Escudo' : ''}</p>
         <ul>${c.habs.map(x => `<li>${esc(x)}</li>`).join('')}</ul>${subir}
+        ${!s.exp ? `<details class="sans peq" style="margin-top:8px"><summary class="mudo">Mudar retrato</summary>${seletorRetrato(retHeroi(h), 'ret-heroi" data-h="' + h.id)}</details>` : ''}
         ${!s.exp && s.herois.length > 1 ? `<p style="margin-top:10px"><button class="btn peq perigo" data-act="reformar" data-v="${h.id}">Deixar a companhia</button></p>` : ''}</div>`;
     }).join('') + `<p class="sans peq mudo">Testes: 1D6 + atributo + bónus. Total 1–2 falha · 3–4 sucesso parcial · 5+ sucesso. O modificador total fica entre −2 e +3.</p>`;
   }
@@ -288,9 +336,9 @@
       }
       if (!emExp && G.valorVenda(k) > 0) btns.push(`<button class="btn peq sec2" data-act="vender" data-v="${k}">Vender ${G.valorVenda(k)} ◈</button>`);
       const desc = d.desc || d.nota || (D.armas[k] ? `Arma: ${R.ATTR[D.armas[k].attr]}, dano ${D.armas[k].dano}` : D.armaduras[k] ? `+${D.armaduras[k].vida} Vida máxima` : '');
-      return `<div class="linha"><div class="n">${esc(d.nome)}${n > 1 ? ' ×' + n : ''}<small>${esc(desc)}</small></div><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${btns.join('')}</div></div>`;
+      return `<div class="linha">${ico(k, 32)}<div class="n">${esc(d.nome)}${n > 1 ? ' ×' + n : ''}<small>${esc(desc)}</small></div><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${btns.join('')}</div></div>`;
     }).join('');
-    return `<div class="cartao"><h3>◈ ${s.ouro} moedas de ouro</h3><p class="sans peq mudo">A bolsa e a mochila são partilhadas por toda a companhia. Lanternas, gazuas, cordas e pés-de-cabra funcionam sozinhos, desde que estejam na mochila.</p></div>
+    return `<div class="cartao"><h3 class="com-ret">${ico('ouro', 32)}${s.ouro} moedas de ouro</h3><p class="sans peq mudo">A bolsa e a mochila são partilhadas por toda a companhia. Lanternas, gazuas, cordas e pés-de-cabra funcionam sozinhos, desde que estejam na mochila.</p></div>
       <div class="cartao">${linhas || '<p class="mudo">A mochila está vazia.</p>'}</div>`;
   }
 
@@ -353,6 +401,7 @@
           <button class="btn peq ${CP.Som.efeitos ? '' : 'sec2'}" data-act="efeitos">Efeitos: ${CP.Som.efeitos ? 'ligados' : 'desligados'}</button></div>
         <label class="sans peq mudo" style="display:flex;align-items:center;gap:10px">Volume da música <input type="range" min="0" max="1" step="0.05" value="${CP.Som.volume}" data-input="volume" style="flex:1"></label>
         <p class="sans peq mudo" style="margin-bottom:0">Música: «The Longest Journey», de Alexander Nakarada. Os efeitos são gerados pelo jogo.</p></div>` : ''}
+      <div class="cartao"><h3>Créditos</h3><p class="sans peq mudo" style="margin:0">Retratos: «RPG Character Portraits». Objectos: GELOZ GAMES. Música: Alexander Nakarada.</p></div>
       <div class="cartao"><h3>Aparência</h3><div style="display:flex;gap:8px">${Object.keys(temas).map(t => `<button class="btn peq ${ui.tema === t ? '' : 'sec2'}" data-act="tema" data-v="${t}">${temas[t]}</button>`).join('')}</div></div>
       ${s && s.exp ? `<div class="cartao"><h3>Expedição</h3><p class="sans peq mudo">Abandonar conta como retirada: guardas o que encontraste, mas não cumpres a missão.</p><button class="btn perigo" data-act="abandonar">Abandonar a expedição</button></div>` : ''}
       <div class="cartao"><h3>Recomeçar</h3><p class="sans peq mudo">Apaga a campanha deste aparelho. Exporta-a primeiro se a quiseres guardar.</p><button class="btn perigo" data-act="apagar">Apagar campanha</button></div>
@@ -365,6 +414,7 @@
     return `<p class="sans peq mudo">Cada herói extra é outro jogador à volta da mesa (ou mais um herói teu). Os inimigos ficam mais fortes com grupos maiores.</p>
       <input class="campo" id="nomeRec" maxlength="18" placeholder="Nome do herói" value="${esc(r.nome)}">
       <div class="classes">${Object.keys(D.classes).map(k => `<button class="classe ${r.cls === k ? 'on' : ''}" data-act="rec-cls" data-v="${k}"><b>${D.classes[k].nome}</b><small>${esc(D.classes[k].desc)}</small></button>`).join('')}</div>
+      <div class="sec">Retrato</div>${seletorRetrato(r.ret || A.porClasse[r.cls], 'rec-ret')}
       <button class="btn grande" data-act="rec-ok">Juntar à companhia</button>`;
   }
 
@@ -422,7 +472,10 @@
       case 'nova': ui.screen = 'nova'; ui.criar = null; break;
       case 'capa': ui.screen = 'capa'; ui.criar = null; break;
       case 'modo': ui.criar.herois[ui.criar.idx].nome = lerNome('nomeHeroi'); ui.criar.n = +v; ui.criar.modo = +v > 1 ? 'coop' : 'solo'; while (ui.criar.herois.length < +v) ui.criar.herois.push({ nome: '', cls: ['ladrao', 'explorador', 'mistico', 'guerreiro'][ui.criar.herois.length - 1] }); ui.criar.herois.length = +v; break;
-      case 'cls': ui.criar.herois[ui.criar.idx].nome = lerNome('nomeHeroi'); ui.criar.herois[ui.criar.idx].cls = v; break;
+      case 'cls': { const hh = ui.criar.herois[ui.criar.idx]; hh.nome = lerNome('nomeHeroi'); hh.cls = v; if (!hh.retManual) hh.ret = A.porClasse[v]; break; }
+      case 'ret': { const hh = ui.criar.herois[ui.criar.idx]; hh.nome = lerNome('nomeHeroi'); hh.ret = v; hh.retManual = true; break; }
+      case 'ret-heroi': { const hh = S().herois.find(x => x.id === b.dataset.h); if (hh) { hh.retrato = v; G.save(); } break; }
+      case 'rec-ret': ui.rec.nome = lerNome('nomeRec'); ui.rec.ret = v; ui.rec.retManual = true; break;
       case 'criar-voltar': ui.criar.herois[ui.criar.idx].nome = lerNome('nomeHeroi'); ui.criar.idx--; break;
       case 'criar-ok': {
         const c = ui.criar;
@@ -430,11 +483,11 @@
         if (c.idx < c.n - 1) { c.idx++; break; }
         if (c.nova) {
           G.novaCampanha(c.modo);
-          c.herois.forEach(h => G.criarHeroi(h.nome, h.cls));
+          c.herois.forEach(h => G.criarHeroi(h.nome, h.cls, h.ret));
           G.log('title', 'Corvamonte');
           G.log('narr', `Chegas a Corvamonte ao cair da tarde, com ${c.n > 1 ? 'os teus companheiros e ' : ''}poucas moedas no bolso. ${D.regiao.descricao} No adro da igreja, um quadro de madeira cheio de papéis pregados: gente que precisa de alguém que não tenha medo do escuro.`);
           G.log('sys', 'Escolhe uma missão no quadro. Tem à mão papel quadriculado, um lápis e o teu dado.');
-        } else c.herois.forEach(h => G.criarHeroi(h.nome, h.cls));
+        } else c.herois.forEach(h => G.criarHeroi(h.nome, h.cls, h.ret));
         G.save();
         ui.criar = null; ui.screen = 'jogo'; ui.rolarAldeia = true;
         break;
@@ -457,10 +510,10 @@
       case 'subir': G.subirNivel(b.dataset.h, v); toast('Nível acima!'); break;
       case 'reformar': ui.confirmar = { texto: 'Este herói deixa a companhia para sempre. Continuar?', ok: 'Deixar partir', perigo: true, fn: () => G.removerHeroi(v) }; break;
       case 'recrutar': ui.folha = 'recrutar'; ui.rec = null; break;
-      case 'rec-cls': ui.rec.nome = lerNome('nomeRec'); ui.rec.cls = v; break;
+      case 'rec-cls': ui.rec.nome = lerNome('nomeRec'); ui.rec.cls = v; if (!ui.rec.retManual) ui.rec.ret = A.porClasse[v]; break;
       case 'rec-ok': {
         const nome = lerNome('nomeRec') || sugerirNome(ui.rec.cls, S().herois.length);
-        G.criarHeroi(nome, ui.rec.cls);
+        G.criarHeroi(nome, ui.rec.cls, ui.rec.ret);
         if (S().herois.length > 1) S().modo = 'coop';
         G.save(); ui.folha = null; ui.rec = null; toast(nome + ' junta-se à companhia.');
         break;
