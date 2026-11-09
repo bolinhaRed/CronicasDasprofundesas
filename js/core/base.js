@@ -74,6 +74,7 @@ CP.DATA = CP.DATA || {};
       ler: { attr: 'MEN', nome: 'Decifrar' },
       falar: { attr: 'MEN', nome: 'Persuadir' },
       magia: { attr: 'MEN', nome: 'Magia' },
+      socorro: { attr: 'MEN', nome: 'Primeiros socorros' },
       ataque: { attr: null, nome: 'Ataque' }
     },
     MOD_MIN: -2,

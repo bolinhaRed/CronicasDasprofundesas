@@ -1,6 +1,14 @@
 # Licenças dos recursos gráficos
 
-Estes recursos estão incluídos apenas como parte do jogo. Não podem ser redistribuídos separadamente.
+Estes recursos estão incluídos apenas como parte do jogo e não podem ser redistribuídos separadamente.
+
+* **Interface** — «Humble Gift» (Humble Pixel, humblepixel.itch.io). Uso comercial e não comercial permitido, com modificações; proibida a redistribuição dos recursos. Crédito: @Humblepixel.
+* **Ícones** — «MV Icons Complete Sheet» (versão gratuita). Ver o EULA do autor que acompanha o pacote.
+* **Retratos redondos** — «Free 39 Portraits Pixel Art» (CraftPix.net), licença CraftPix: https://craftpix.net/file-licenses/
+* **Retratos com expressões** — «RPG Character Portraits» (Gen XIA).
+* **Música** — «The Longest Journey», de Alexander Nakarada.
+
+Inspiração de regras: algumas ideias de mecânica foram inspiradas pelo Ironsworn (Shawn Tomkin) e pelo espírito dos RPG «old school». Nenhum texto desses livros foi copiado; todo o texto do jogo é original.
 
 ## Retratos — «RPG Character Portraits» (Gen XIA)
 
@@ -18,27 +26,3 @@ The assets were generated procedurally for this pack. No third-party artwork is 
 Provided as-is, without warranty of any kind.
 ```
 
-## Objectos — «Zroth Object», GELOZ GAMES
-
-```
-Copyright (c) [2026] [GELOZ GAMES]
-
-Permission is granted to use, copy, modify, and include these assets in personal or commercial projects, free of charge.
-
-You may:
-
-- Use the assets in commercial and non-commercial games, applications, videos, websites, artwork, and other projects.
-- Modify, edit, recolor, animate, or adapt the assets.
-
-You may not:
-
-- Sell, sublicense, or redistribute the assets by themselves, whether modified or unmodified.
-- Include the assets in another asset pack, template, collection, or similar product where the assets can be extracted or reused.
-- Claim the original assets as your own creation.
-
-The assets may be included in a paid product, provided that the product contains substantial original work and is not primarily a redistribution of the assets.
-
-Attribution is appreciated but not required.
-
-These assets are provided “as is”, without warranty of any kind. The creator shall not be held liable for any damages or claims resulting from their use.
-```

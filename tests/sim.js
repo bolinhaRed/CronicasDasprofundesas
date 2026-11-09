@@ -4,7 +4,7 @@ global.window = global;
 const store = {};
 global.localStorage = { getItem: k => store[k] || null, setItem: (k, v) => { store[k] = v; }, removeItem: k => { delete store[k]; } };
 const base = __dirname + '/../js/';
-['core/base.js', 'data/regras.js', 'data/arte.js', 'data/masmorras.js', 'data/missoes.js', 'core/masmorra.js', 'core/parser.js', 'core/motor.js'].forEach(f => require(base + f));
+['core/base.js', 'data/regras.js', 'data/arte.js', 'data/masmorras.js', 'data/missoes.js', 'data/dilemas.js', 'data/legado.js', 'data/sombras.js', 'core/masmorra.js', 'core/parser.js', 'core/motor.js'].forEach(f => require(base + f));
 const CP = global.CP, G = CP.Game, C = CP.C;
 let falhas = 0;
 const erro = (m) => { falhas++; if (falhas < 30) console.log('  ✗', m); };
@@ -86,6 +86,7 @@ function jogar(mid, nHerois, seed, verbose) {
   const classes = ['guerreiro', 'ladrao', 'explorador', 'mistico'];
   for (let i = 0; i < nHerois; i++) G.criarHeroi('Herói' + (i + 1), classes[(seed + i) % 4]);
   S.ouro = 30;
+  if (seed % 3 === 0) { S.ouro += 60; G.contratar(['cao', 'arqueira', 'escudeiro', 'escriba', 'curandeira'][seed % 5]); if (nHerois === 1) G.contratar('curandeira'); }
   if (mid === 'ossario') { S.mochila.mao_ilva = 1; }
   G.partir(mid);
   const rnd = rngSim(seed * 7919 + 13);
@@ -95,6 +96,7 @@ function jogar(mid, nHerois, seed, verbose) {
     passos++;
     const e = S.exp;
     if (e.pending) { const n = 1 + Math.floor(rnd() * 6); G.roll(n); continue; }
+    if (e.escolha) { G.escolherBencao(e.escolha.opcoes[Math.floor(rnd() * e.escolha.opcoes.length)]); continue; }
     const sug = G.sugestoes();
     const pick = (f) => sug.find(f);
     let s =
@@ -163,6 +165,25 @@ for (let i = 0; i < N; i++) {
   res.rumores = res.rumores || { sucesso: 0, retirada: 0, derrota: 0, morte: 0 };
   res.rumores[r.fim]++;
 }
+// masmorra do dia
+{ const hoje = G.hojeId(); const a = jogar(hoje, 2, 900, false); const S = G.S();
+  if (!S.diarios[hoje] || S.diarios[hoje].estado !== 'feito') erro('diário não registado');
+  if (G.missoesDisponiveis().some(m => m.id === hoje)) erro('diário repetível');
+  console.log('diário', a.fim, 'pontos', a.pontos, a.relatorio); }
+// legado: verificar que relíquias/feitos não rebentam e que os stats contam
+{ G.novaCampanha('solo'); const S = G.S(); S.seed = 'leg'; G.criarHeroi('L', 'guerreiro');
+  S.reliquiaPendente = 1; const of = G.ofertaReliquia(); if (!of || of.opcoes.length !== 3) erro('oferta relíquia');
+  G.escolherReliquia(of.opcoes[0]); if (S.reliquias.length !== 1) erro('relíquia não ficou');
+  G.stat('secretas', 3); if (!S.feitos.secretas || !S.desbloq.cartografo) erro('feito secretas');
+  G.stat('missoes', 5); if (S.slots !== 4) erro('slot');
+  S.ouro = 100; if (!G.contratar('cao') || !G.contratar('escriba') || G.contratar('arqueira')) erro('contratar/limite');
+  const h0 = S.herois[0]; S.sobrev = [{ tipo: 'heroi', id: h0.id }, { tipo: 'comp', id: S.comps[0].id }];
+  if (G.partir('sinos'), S.exp) erro('partiu com sobrevivência pendente');
+  G.rollSobrev(1); if (G.pendenteSobrev().fase !== 'cicatriz') erro('fase cicatriz'); G.rollSobrev(5);
+  if (!h0.cicatrizes.includes('peito')) erro('cicatriz'); G.rollSobrev(1); if (S.comps.length !== 1) erro('comp morto');
+  if (G.pendenteSobrev()) erro('fila sobrev');
+  console.log('sombras ok', h0.cicatrizes, S.comps.map(c => c.nome));
+  console.log('legado ok', S.reliquias, Object.keys(S.feitos)); }
 console.log(`\nJogos completos: ${total} + ${N} rumores (dados aleatórios justos, robô simples).`);
 Object.keys(res).forEach(k => console.log(k.padEnd(10), JSON.stringify(res[k])));
 console.log(`\nFalhas totais: ${falhas}`);

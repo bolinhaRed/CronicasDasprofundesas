@@ -1,8 +1,8 @@
 /* Service worker: tudo em cache para jogar sem internet. Muda a VERSAO quando actualizares ficheiros. */
-const VERSAO = 'cronicas-v1.3.0';
+const VERSAO = 'cronicas-v2.4.0';
 const FICHEIROS = [
-  './', './index.html', './manifest.webmanifest', './css/estilo.css',
-  './js/core/base.js', './js/data/regras.js', './js/data/arte.js', './js/data/masmorras.js', './assets/retratos.png', './assets/objectos.png', './js/data/missoes.js',
+  './', './index.html', './manifest.webmanifest', './css/estilo.css', './css/pixel.css', './assets/icones.png', './assets/retratos2.png', './assets/ui/painel.png', './assets/ui/painel_alto.png', './assets/ui/botao.png', './assets/ui/botao2.png', './assets/ui/botao_prem.png', './assets/ui/ornamento.png',
+  './js/core/base.js', './js/data/regras.js', './js/data/arte.js', './js/data/masmorras.js', './assets/retratos.png', './js/data/missoes.js', './js/data/dilemas.js', './js/data/legado.js', './js/data/sombras.js', './assets/ui/esc_painel.png', './assets/ui/esc_painel_alto.png', './assets/ui/esc_botao.png', './assets/ui/esc_botao2.png', './assets/ui/esc_botao_prem.png', './assets/ui/esc_botao_red.png',
   './js/core/masmorra.js', './js/core/parser.js', './js/core/motor.js', './js/ui/som.js', './js/ui/mapa.js', './audio/musica.mp3', './js/ui/app.js',
   './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-512-maskable.png'
 ];

@@ -249,7 +249,7 @@ input[type=range] { accent-color: var(--sangue); }
 /* ---------- arte em pixel ---------- */
 .px { display: inline-block; image-rendering: pixelated; image-rendering: crisp-edges; background-repeat: no-repeat; flex: none; vertical-align: middle; }
 .ret { background-image: url("../assets/retratos.png"); background-color: #2b2530; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
-.ico { background-image: url("../assets/objectos.png"); }
+.ico { background-image: url("../assets/icones.png"); }
 .hcol { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .heroi .hcol { min-width: 66px; }
 .heroi.ouro { min-width: auto; }
@@ -274,3 +274,29 @@ input[type=range] { accent-color: var(--sangue); }
 .inimigo.boss { box-shadow: inset 0 0 0 1px var(--sangue); }
 .inimigo b { font-size: 12.5px; white-space: nowrap; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
 .inimigo .st { color: var(--tinta2); }
+
+/* ---------- luz, origens, talentos ---------- */
+.luz { display: flex; align-items: center; gap: 4px; border: 1px solid var(--linha); background: var(--cartao); border-radius: 10px; padding: 3px 7px 3px 3px; font-family: var(--sans); font-size: 10px; color: var(--mudo); flex: none; }
+.luz span { display: flex; flex-direction: column; gap: 2px; line-height: 1.1; }
+.luz .chama { display: block; width: 38px; height: 5px; border-radius: 3px; background: var(--papel2); overflow: hidden; }
+.luz .chama i { display: block; height: 100%; background: linear-gradient(90deg, #c8661e, #f0b43c); }
+.luz.fraca { border-color: #c8661e; }
+.luz.escuro { border-color: var(--sangue); color: var(--sangue); background: var(--tinta); }
+.luz.escuro b { color: var(--sangue); font-size: 11px; }
+.topo .relogio { min-width: 0; }
+.morrer { color: var(--sangue); font-style: normal; font-weight: 700; }
+.origens { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 6px 0 12px; }
+.origens button { text-align: left; border: 1.5px solid var(--linha); border-radius: 10px; background: var(--cartao); padding: 8px 10px; }
+.origens button b { display: block; font-size: 15px; }
+.origens button small { display: block; font-family: var(--sans); font-size: 11.5px; color: var(--mudo); line-height: 1.3; }
+.origens button.on { border-color: var(--sangue); box-shadow: inset 0 0 0 1px var(--sangue); }
+.talentos { padding-left: 20px; margin: 8px 0 10px; }
+.talentos li { margin-bottom: 2px; }
+
+.topo { gap: 6px; padding-left: 12px; padding-right: 10px; }
+.topo .btn-ic { width: 36px; height: 36px; font-size: 16px; }
+.relogio .pips { display: grid; grid-template-columns: repeat(3, 8px); gap: 3px; }
+.luz .chama { width: 30px; }
+.luz { padding-right: 6px; }
+
+.ret2.ferido { filter: sepia(1) saturate(3) hue-rotate(-40deg); }

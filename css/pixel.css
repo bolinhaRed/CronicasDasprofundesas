@@ -1,0 +1,280 @@
+/* Tema «pixel»: moldura nocturna + pergaminho, com painéis e botões em pixel art (Humble Pixel). */
+:root, :root[data-tema="escuro"], :root[data-tema="claro"] {
+  --noite: #0d0a0f;
+  --noite2: #161118;
+  --noite3: #241a24;
+  --claro: #eadbc4;
+  --claro2: #a8927e;
+  --papel: #1e161e;
+  --papel2: #2c212b;
+  --cartao: #2a1f29;
+  --tinta: #eadbc4;
+  --tinta2: #cdb79e;
+  --mudo: #9a8473;
+  --linha: #4d3a47;
+  --sangue: #ee5d70;
+  --sangue2: #ff7a88;
+  --grafite: #9fc2ef;
+  --grafite-bg: #151c28;
+  --ouro: #f2bb52;
+  --verde: #86d27f;
+  --marinho: #0a080c;
+  --sombra: 0 3px 0 rgba(0, 0, 0, .6);
+  --mp-papel: #17121a; --mp-chao: #2b2229; --mp-grelha: #3d3140; --mp-tinta: #eadbc4; --mp-sombra: #000;
+  color-scheme: dark;
+}
+html, body {
+  background-color: var(--noite);
+  background-image:
+    radial-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+    radial-gradient(rgba(0, 0, 0, .25) 1px, transparent 1px);
+  background-size: 6px 6px, 6px 6px;
+  background-position: 0 0, 3px 3px;
+}
+body { color: var(--tinta); }
+#app { background: transparent !important; border: none !important; }
+@media (min-width: 700px) { body { background-color: #150f18; } }
+
+/* ---- peças de pixel art (9 fatias) ---- */
+.pp-painel { border-style: solid; border-width: 12px; border-image: url("../assets/ui/esc_painel.png") 6 fill / 12px stretch; image-rendering: pixelated; background: none; }
+.pp-botao { border-style: solid; border-width: 7px 7px 9px; border-image: url("../assets/ui/esc_botao.png") 7 7 9 fill / 7px 7px 9px stretch; image-rendering: pixelated; background: none; }
+
+/* ---- cabeçalho ---- */
+.topo { background: linear-gradient(var(--noite2), var(--noite)); border-bottom: 3px solid #0e0a10; color: var(--claro); box-shadow: 0 2px 0 var(--noite3); }
+.topo small { color: var(--claro2); }
+.topo h1 { color: var(--claro); text-shadow: 0 2px 0 #000; }
+.btn-ic, .topo .btn-ic {
+  border-style: solid; border-width: 7px 7px 9px; border-image: url("../assets/ui/esc_botao.png") 7 7 9 fill / 7px 7px 9px stretch; image-rendering: pixelated;
+  background: none; border-radius: 0; color: var(--tinta); padding: 0; font-weight: 700; width: 42px; height: 42px;
+}
+.btn-ic:active { border-image-source: url("../assets/ui/esc_botao_prem.png"); border-image-slice: 7 7 7 fill; border-width: 8px 7px 7px; }
+.relogio .pips i { border-color: var(--claro2); border-radius: 1px; width: 8px; height: 8px; }
+.relogio .pips i.on { background: var(--sangue2); border-color: #ff8a8a; box-shadow: 0 0 6px #ff4d4d; }
+.luz { border-style: solid; border-width: 7px 7px 9px; border-image: url("../assets/ui/esc_botao.png") 7 7 9 fill / 7px 7px 9px stretch; image-rendering: pixelated; background: none; border-radius: 0; padding: 0 2px; color: var(--tinta); }
+.luz .chama { background: #5a3a2c; border-radius: 0; height: 6px; box-shadow: inset 0 0 0 1px var(--marinho); }
+.luz.escuro { border-image-source: url("../assets/ui/esc_botao_red.png"); border-image-slice: 7 7 9 fill; color: #fff; }
+.luz.escuro b { color: #ffb0b0; }
+.luz.fraca .chama i { animation: tremer .7s steps(2) infinite; }
+@keyframes tremer { 50% { opacity: .45; } }
+
+/* ---- grupo ---- */
+.grupo { border-bottom: none; padding: 8px 10px 4px; }
+.heroi {
+  border-style: solid; border-width: 7px 7px 9px; border-image: url("../assets/ui/esc_botao.png") 7 7 9 fill / 7px 7px 9px stretch; image-rendering: pixelated;
+  background: none; border-radius: 0; padding: 1px 6px 1px 1px; color: var(--tinta); min-width: 0;
+}
+.heroi.activo { box-shadow: none; border-image-source: url("../assets/ui/esc_botao2.png"); filter: drop-shadow(0 0 0 #fff) drop-shadow(0 0 4px #ffd27a); }
+.heroi .barra, .inimigo .barra { height: 6px; border-radius: 0; background: #6e4a3b; box-shadow: inset 0 0 0 1px var(--marinho); }
+.heroi .barra > span, .inimigo .barra > span { background: linear-gradient(#e0475a 0 50%, #b42a3c 50%); }
+.ret, .ret2 { border-radius: 4px; box-shadow: 0 0 0 2px var(--marinho); }
+.ret2 { background-image: url("../assets/retratos2.png"); background-color: transparent; border-radius: 50%; box-shadow: none; }
+
+/* ---- história: uma página de pergaminho ---- */
+.historia {
+  margin: 4px 8px 6px; padding: 6px 10px 18px;
+  border-style: solid; border-width: 12px; border-image: url("../assets/ui/esc_painel.png") 6 fill / 12px stretch; image-rendering: auto;
+  background: none;
+}
+.historia { scrollbar-width: thin; scrollbar-color: var(--linha) transparent; }
+.t-title { font-variant: small-caps; letter-spacing: .06em; color: var(--tinta); }
+.t-title { color: #ffd98c; text-shadow: 0 2px 0 #000; }
+.t-title::before, .t-title::after { content: "◆"; display: inline-block; font-size: 10px; color: var(--sangue); margin: 0 10px; vertical-align: middle; transform: none; text-shadow: none; }
+.t-draw {
+  background-color: var(--grafite-bg);
+  background-image: linear-gradient(rgba(159, 194, 239, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(159, 194, 239, .08) 1px, transparent 1px);
+  background-size: 12px 12px; border: 2px solid var(--grafite); border-left-width: 5px; border-radius: 0; box-shadow: 2px 2px 0 rgba(0, 0, 0, .5);
+}
+.t-you { border-top: 2px dashed var(--linha); color: var(--tinta2); }
+.t-roll { background: var(--cartao); border: 2px solid var(--marinho); border-radius: 0; box-shadow: 3px 3px 0 rgba(27, 34, 54, .3); }
+.t-fala { background: #261c26; border: 2px solid var(--marinho); border-radius: 0; box-shadow: 3px 3px 0 rgba(27, 34, 54, .3); }
+.t-fala.cena { border-color: var(--sangue); box-shadow: 3px 3px 0 rgba(158, 34, 54, .35); }
+.t-done { border: 2px solid var(--verde); border-radius: 0; background: rgba(44, 106, 49, .08); }
+.t-clue { border: 2px solid var(--ouro); border-radius: 0; background: rgba(142, 84, 12, .07); }
+b.co { border-radius: 0; background: rgba(238, 93, 112, .16); }
+.t-draw b.co { background: rgba(159, 194, 239, .16); color: var(--grafite); }
+.anteriores { border-radius: 0; border: 2px solid var(--linha); background: var(--cartao); }
+
+/* ---- doca ---- */
+.doca { background: transparent; border-top: none; padding-top: 2px; color: var(--claro); }
+.doca .quem { color: var(--claro2); }
+.doca .quem b { color: var(--claro); }
+.sug {
+  border-style: solid; border-width: 7px 7px 9px; border-image: url("../assets/ui/esc_botao.png") 7 7 9 fill / 7px 7px 9px stretch; image-rendering: pixelated;
+  background: none; border-radius: 0; padding: 2px 6px; color: var(--tinta); font-weight: 600; font-size: 14px;
+}
+.sug:active { transform: translateY(1px); }
+.sug.cena { border-image-source: url("../assets/ui/esc_botao2.png"); color: #ffd98c; background: none; }
+.sug.combate { border-image-source: url("../assets/ui/esc_botao_red.png"); color: #fff; background: none; text-shadow: 0 1px 0 #000; }
+.sug.mov { color: var(--grafite); }
+.sug.magia { color: #5b2a8a; }
+.sug.perigo { color: var(--mudo); opacity: .8; }
+.sug.mais { color: var(--mudo); }
+.cmd input { border-radius: 0; border: 3px solid var(--marinho); background: var(--cartao); color: var(--tinta); box-shadow: inset 0 2px 0 rgba(0, 0, 0, .12); }
+.cmd input::placeholder { color: var(--mudo); }
+.cmd button {
+  border-style: solid; border-width: 8px 7px 7px; border-image: url("../assets/ui/esc_botao_prem.png") 7 7 7 fill / 8px 7px 7px stretch; image-rendering: pixelated;
+  background: none; border-radius: 0; color: #fff; text-shadow: 0 1px 0 #000;
+}
+.inimigo { border-style: solid; border-width: 7px 7px 9px; border-image: url("../assets/ui/esc_botao2.png") 7 7 9 fill / 7px 7px 9px stretch; image-rendering: pixelated; background: none; border-radius: 0; color: var(--sangue); }
+.inimigo b { color: var(--sangue); }
+.inimigo.boss { box-shadow: none; filter: drop-shadow(0 0 5px #ff4d4d); }
+.inimigo .st { color: var(--tinta2); }
+
+/* ---- dado ---- */
+.dado { color: var(--claro); }
+.dado .mods { color: var(--claro2); }
+.dado .leg span { background: var(--noite3); color: var(--claro); border-radius: 0; box-shadow: 0 0 0 1px #0e0a10; }
+.dado .ajud button { border: 2px dashed var(--claro2); color: var(--claro); border-radius: 0; }
+.dado .ajud button.on { background: var(--claro); color: var(--tinta); border-style: solid; }
+.dado .nota { color: var(--claro2); }
+.face {
+  border-style: solid; border-width: 7px 7px 9px; border-image: url("../assets/ui/esc_botao.png") 7 7 9 fill / 7px 7px 9px stretch; image-rendering: pixelated;
+  background: none; border-radius: 0; box-shadow: none; padding: 0; display: grid; place-items: center; grid-template: none;
+}
+.face:active { transform: translateY(2px); }
+.face .px { max-width: 100%; }
+.cartao .face { background: none; }
+
+/* ---- separadores ---- */
+.tabs { background: linear-gradient(var(--noite), #120d14); border-top: 3px solid #0e0a10; box-shadow: 0 -2px 0 var(--noite3); }
+.tabs button { color: var(--claro2); font-weight: 600; }
+.tabs button .px { width: 26px; height: 26px; }
+.tabs button.on { color: #ffd27a; }
+.tabs button.on .px { filter: drop-shadow(0 0 4px #ffb84d); transform: translateY(-1px); }
+
+/* ---- folhas e cartões ---- */
+.folha-fundo { background: rgba(10, 6, 14, .65); }
+.folha {
+  border-style: solid; border-width: 14px 14px 0; border-image: url("../assets/ui/esc_painel_alto.png") 7 7 0 fill / 14px 14px 0 stretch; image-rendering: pixelated;
+  background: none; border-radius: 0; box-shadow: 0 -4px 0 rgba(0, 0, 0, .4);
+}
+.folha header { border-bottom: 2px dashed var(--linha); padding-top: 4px; }
+.cartao {
+  border-style: solid; border-width: 10px; border-image: url("../assets/ui/esc_painel.png") 6 fill / 10px stretch; image-rendering: pixelated;
+  background: none; border-radius: 0; box-shadow: none; padding: 6px 8px;
+}
+.cartao.aqui { filter: drop-shadow(0 0 4px var(--sangue2)); }
+.folha .cartao { border-image-source: url("../assets/ui/esc_painel.png"); filter: brightness(1.04); }
+.sec { color: var(--claro2); }
+.folha .sec, .historia .sec { color: var(--mudo); }
+.linha { border-bottom: 2px dotted var(--linha); }
+.btn {
+  border-style: solid; border-width: 7px 7px 9px; border-image: url("../assets/ui/esc_botao_prem.png") 7 7 7 fill / 7px 7px 9px stretch; image-rendering: pixelated;
+  background: none; border-radius: 0; color: #fff; text-shadow: 0 1px 0 #000; padding: 3px 10px;
+}
+.btn.sec2 { border-image-source: url("../assets/ui/esc_botao.png"); border-image-slice: 7 7 9 fill; color: var(--tinta); text-shadow: none; }
+.btn.perigo { border-image-source: url("../assets/ui/esc_botao_red.png"); border-image-slice: 7 7 9 fill; color: #fff; }
+.btn.grande { padding: 8px; border-width: 9px 9px 11px; }
+.btn:active { transform: translateY(2px); }
+.xp { background: #6e4a3b; border-radius: 0; height: 7px; box-shadow: inset 0 0 0 1px var(--marinho); }
+.xp span { background: linear-gradient(#f2b640 0 50%, #c9851a 50%); }
+.attrs div { border: 2px solid var(--linha); border-radius: 0; background: rgba(0, 0, 0, .25); }
+.retratos button, .origens button, .classe, .modos button { border-radius: 0; border: 2px solid var(--linha); background: rgba(0, 0, 0, .25); color: var(--tinta); }
+.retratos button.on, .origens button.on, .classe.on, .modos button.on { border-color: var(--sangue); box-shadow: inset 0 0 0 2px var(--sangue); background: rgba(120, 40, 55, .35); }
+.campo { border-radius: 0; border: 3px solid var(--marinho); background: var(--cartao); color: var(--tinta); }
+.mapa-caixa { border-radius: 0; border: 3px solid var(--marinho); }
+.toast { border-radius: 0; background: var(--noite2); color: var(--claro); border: 2px solid var(--claro2); }
+
+/* ---- capa, criação e aldeia (sobre a noite) ---- */
+.capa { color: var(--claro); }
+.capa h1 { color: var(--claro); text-shadow: 0 3px 0 #000; }
+.capa h1 small { color: var(--claro2); }
+.capa .lema, .capa .precisas, .capa .mudo, .capa .sans.peq.mudo { color: var(--claro2) !important; }
+.capa .logo .orn { color: #ffd27a; }
+.capa .logo .brasao { width: 128px; height: 128px; margin: 0 auto 6px; image-rendering: pixelated; }
+.capa .sec { color: var(--claro2); }
+.capa .classe, .capa .origens button, .capa .retratos button, .capa .modos button { background: var(--cartao); }
+.capa .classe small, .capa .origens button small { color: var(--mudo); }
+.capa .cartao { color: var(--tinta); }
+.aldeia { color: var(--claro); }
+.aldeia .cartao { color: var(--tinta); }
+.relato { border-left-width: 10px; border-left-style: solid; padding-left: 8px; }
+.missao .rec { color: var(--ouro); display: flex; align-items: center; gap: 2px; }
+.juramento { display: flex; gap: 3px; margin: 8px 0 4px; }
+.juramento i { flex: 1; height: 14px; background: #1a1319; box-shadow: inset 0 0 0 2px var(--marinho); }
+.juramento i.on { background: linear-gradient(#f2b640 0 50%, #c9851a 50%); }
+.impeto { display: inline-flex; gap: 2px; vertical-align: middle; }
+.impeto i { width: 7px; height: 12px; background: #5a3a2c; box-shadow: inset 0 0 0 1px var(--marinho); }
+.impeto i.on { background: linear-gradient(#7ad0ff 0 50%, #3a8fd0 50%); }
+.oraculo-res { font-size: 22px; font-weight: 700; text-align: center; margin: 8px 0; color: var(--tinta); }
+
+.face { position: relative; }
+.face .num { position: absolute; right: 2px; bottom: 0; font-family: var(--sans); font-weight: 800; font-size: 13px; color: #ffd98c; text-shadow: 0 1px 0 #000; }
+.capa .logo .px { filter: drop-shadow(0 4px 0 #000); margin-bottom: 4px; }
+
+/* ---------- efeitos ---------- */
+.fx { position: absolute; inset: 0; pointer-events: none; z-index: 50; display: grid; place-items: center; }
+.fx-dano { animation: flashV 0.55s ease-out; }
+.fx-cura { animation: flashG 0.7s ease-out; }
+.fx-ouro { animation: flashO 0.8s ease-out; }
+@keyframes flashV { from { background: rgba(255, 30, 50, .38); } to { background: transparent; } }
+@keyframes flashG { from { background: rgba(80, 255, 120, .2); } to { background: transparent; } }
+@keyframes flashO { from { background: rgba(255, 200, 80, .22); } to { background: transparent; } }
+.carimbo { font-family: var(--sans); font-weight: 900; font-size: 44px; letter-spacing: .06em; padding: 6px 20px; border: 5px solid currentColor; transform: rotate(-8deg); text-shadow: 0 4px 0 #000; box-shadow: 0 0 0 4px #000, 6px 8px 0 4px rgba(0,0,0,.5); background: rgba(13, 10, 15, .85); animation: carimbo 1.25s cubic-bezier(.2, 1.6, .4, 1) forwards; }
+.carimbo.bom { color: #86d27f; }
+.carimbo.meio { color: #f2bb52; }
+.carimbo.mau { color: #ff5f72; }
+.carimbo.crit { color: #ffd98c; animation-name: carimboCrit; }
+@keyframes carimbo { 0% { transform: rotate(-8deg) scale(2.6); opacity: 0; } 18% { transform: rotate(-8deg) scale(1); opacity: 1; } 75% { opacity: 1; } 100% { transform: rotate(-8deg) scale(.96); opacity: 0; } }
+@keyframes carimboCrit { 0% { transform: rotate(-8deg) scale(3); opacity: 0; } 15% { transform: rotate(-8deg) scale(1); opacity: 1; } 30% { transform: rotate(-4deg) scale(1.12); } 45% { transform: rotate(-8deg) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+.moedas { animation: moedas 1s ease-out forwards; }
+@keyframes moedas { from { transform: translateY(40px) scale(.6); opacity: 0; } 30% { transform: translateY(0) scale(1.3); opacity: 1; } to { transform: translateY(-80px) scale(1); opacity: 0; } }
+#app.tremer { animation: tremer2 .42s; }
+@keyframes tremer2 { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-7px) rotate(-.4deg); } 40%, 60% { transform: translateX(7px) rotate(.4deg); } }
+.historia .novo { animation: entra .45s ease-out both; }
+.historia .novo:nth-child(n+2) { animation-delay: .04s; }
+@keyframes entra { from { opacity: 0; transform: translateY(8px); } }
+.dado.rolar .face { animation: abanar .42s; }
+.dado.rolar .face.escolhida { animation: rolarDado .42s; filter: drop-shadow(0 0 8px #ffd98c); }
+@keyframes abanar { 25% { transform: translateY(-3px) rotate(-6deg); } 75% { transform: translateY(2px) rotate(6deg); } }
+@keyframes rolarDado { 0% { transform: rotate(0) scale(1); } 50% { transform: rotate(200deg) scale(1.25); } 100% { transform: rotate(360deg) scale(1); } }
+.t-fala.cena { animation: pulsoCena 1.8s ease-in-out 2; }
+@keyframes pulsoCena { 50% { box-shadow: 3px 3px 0 rgba(0,0,0,.5), 0 0 14px rgba(238, 93, 112, .45); } }
+
+.intencao { font-size: 11.5px; font-weight: 700; color: #ffd98c; white-space: nowrap; }
+.intencao.perigo { color: #ff7a88; animation: tremer .6s steps(2) infinite; }
+.intencao.defende, .intencao.atordoado { color: #9fc2ef; }
+.intencao.fugir, .intencao.chamar { color: #f2bb52; }
+.inimigos { flex-wrap: nowrap; }
+
+/* ---------- legado: bênçãos, relíquias, feitos, relatório */
+.escolha{padding:8px 10px}
+.escolha .q{font-weight:bold;color:var(--ouro);margin-bottom:6px}
+.cartas{display:grid;gap:6px;margin:6px 0}
+.carta-pass{display:flex;gap:8px;align-items:center;text-align:left;background:#15100c;border:2px solid #4a3a2a;color:var(--tinta);padding:6px 8px;font:inherit;cursor:pointer;border-radius:3px}
+.carta-pass:disabled{cursor:default;opacity:1}
+.carta-pass:not(:disabled):hover{border-color:var(--ouro);transform:translateY(-1px)}
+.carta-pass b{font-size:15px}
+.carta-pass small{font-family:var(--sans,sans-serif);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#9a8a70}
+.carta-pass .d{font-family:var(--sans,sans-serif);font-size:12px;opacity:.9}
+.carta-pass.raro{border-color:#3d6fa8}.carta-pass.raro small{color:#7fb0ea}
+.carta-pass.lendario{border-color:#c9952a;box-shadow:0 0 10px rgba(201,149,42,.35)}.carta-pass.lendario small{color:#f0c050}
+.escolha .carta-pass{animation:entra .35s both}
+.escolha .carta-pass:nth-child(2){animation-delay:.08s}.escolha .carta-pass:nth-child(3){animation-delay:.16s}.escolha .carta-pass:nth-child(4){animation-delay:.24s}
+.risco{color:#e8a040}
+.relatorio .stats{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.relatorio .stats span{flex:1 1 70px;background:#120d0a;border:1px solid #3a2e22;padding:4px 6px;font-family:var(--sans,sans-serif);font-size:11px;color:#a89878;text-align:center}
+.relatorio .stats b{display:block;font-size:18px;color:var(--tinta)}
+.relatorio .stats .perda b{color:#e05a4a}.relatorio .stats .pts b{color:var(--ouro)}
+.relatorio.bom{border-color:#5a8a3a}.relatorio.mau{border-color:#8a2a22}
+.relatorio .quase{color:#e8a040;margin:4px 0}
+.reliq{border-color:var(--ouro)}
+.feito-prox .barra.xp{height:6px;background:#1a1410;margin-top:4px}
+.feito-prox .barra.xp span{display:block;height:100%;background:var(--ouro)}
+.missao.diaria{border-color:#7a5ab0;box-shadow:0 0 12px rgba(122,90,176,.25)}
+.linha.feito .n{opacity:.6}.linha.feito.ok .n{opacity:1;color:var(--ouro)}
+.t-feito,.t-tesouro{color:var(--ouro);font-weight:bold}
+.t-escolha{color:#b89ae0;font-style:italic}
+
+/* ---------- sombras: companheiros, sobrevivência, façanhas */
+.comps{display:flex;flex-wrap:wrap;gap:4px;padding:0 10px 4px}
+.comp{display:inline-flex;align-items:center;gap:4px;background:#15100c;border:1px solid #4a3a2a;padding:2px 6px;font-family:var(--sans,sans-serif);font-size:11px;color:var(--tinta2)}
+.comp b{color:var(--tinta)}
+.comp.caido{opacity:.5;text-decoration:line-through}
+.comp.sv{border-color:#6a8a4a;color:#b8d890}
+.sobrev{border-color:var(--sangue)}
+.linha-loja{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed #3a2e22;font-family:var(--sans,sans-serif);font-size:13px}
+.facanhas{list-style:none;padding:0;margin:4px 0;font-family:var(--sans,sans-serif);font-size:12px}
+.facanhas li{padding:2px 0;color:#9a8a70}.facanhas li.ok{color:#a8d080}.facanhas b{color:var(--ouro);font-weight:600}
+.leg .riscado{text-decoration:line-through;opacity:.45}
+.t-sombra{color:#b07ae0;font-weight:bold;letter-spacing:.04em}

@@ -256,6 +256,23 @@
       }
     });
 
+    // dilemas: salas vazias ganham uma escolha com risco e recompensa
+    if (D.dilemas) {
+      const ocupadas = new Set(Object.values(dg.ents).filter(e => ['inimigo', 'npc', 'enigma'].includes(e.kind)).map(e => e.zone));
+      const vazias = rng.shuffle(rooms.filter(r => r !== obj && r.id !== 0 && r !== secreta && !ocupadas.has(r.id)));
+      const pool = rng.shuffle(D.dilemas.filter(d => !d.tipos || d.tipos.includes(m.tipo)));
+      const n = Math.min(3, vazias.length, pool.length);
+      for (let i = 0; i < n; i++) {
+        if (i >= 2 && !rng.chance(0.5)) continue;
+        const c = freeCell(vazias[i]);
+        if (!c) continue;
+        const d = clone(pool[i]);
+        d.opcoes.forEach(o => { o.id = d.id + '_' + o.id; });
+        d.opcoes.push({ id: d.id + '_ignorar', rotulo: 'Deixar e seguir', kw: ['deixar', 'ignorar', 'seguir'], efeitos: [{ t: 'Deixas isso para trás. Talvez seja melhor assim.' }, { fimCena: true }], ignorar: true });
+        add(Object.assign(d, { kind: 'dilema', dilemaId: pool[i].id, zone: vazias[i].id, x: c[0], y: c[1] }));
+      }
+    }
+
     // enigma
     if (rng.chance(0.6)) {
       const r = rng.pick(rooms.filter(r => r !== obj && r.id !== 0));
